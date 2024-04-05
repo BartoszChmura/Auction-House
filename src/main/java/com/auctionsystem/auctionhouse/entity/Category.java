@@ -1,4 +1,4 @@
-package com.auctionsystem.auctionhouse.Entitiy;
+package com.auctionsystem.auctionhouse.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
