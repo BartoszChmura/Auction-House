@@ -1,37 +1,53 @@
 package com.auctionsystem.auctionhouse.service;
 
+import com.auctionsystem.auctionhouse.dto.CategoryDto;
 import com.auctionsystem.auctionhouse.entity.Category;
+import com.auctionsystem.auctionhouse.mapper.CategoryMapper;
 import com.auctionsystem.auctionhouse.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
+
     @Transactional
-    public void saveCategory(Category category) {
-        categoryRepository.save(category);
+    public CategoryDto saveCategory(Category category) {
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.toDto(savedCategory);
     }
+
     @Transactional
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public Optional<CategoryDto> getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .map(categoryMapper::toDto);
     }
+
     @Transactional
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryDto> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
+
     @Transactional
-    public Category updateCategory(Category category) {
-        return categoryRepository.save(category);
+    public CategoryDto updateCategory(Category category) {
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toDto(updatedCategory);
     }
+
     @Transactional
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
