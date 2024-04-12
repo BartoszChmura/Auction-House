@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "bids")
 public class Bid {
 
     @Id
@@ -25,7 +26,7 @@ public class Bid {
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "userid", referencedColumnName = "userid")
+    @JoinColumn(name = "bidderid", referencedColumnName = "userid")
     private User bidder;
 
     private double bidAmount;
