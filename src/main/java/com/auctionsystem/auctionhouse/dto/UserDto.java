@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,8 @@ public class UserDto {
     private String username;
 
     private String email;
+
+    private String password;
 
     private LocalDateTime createdAt;
 
