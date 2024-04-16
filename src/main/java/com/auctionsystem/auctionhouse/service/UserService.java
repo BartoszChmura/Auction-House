@@ -4,6 +4,8 @@ import com.auctionsystem.auctionhouse.dto.UserDto;
 import com.auctionsystem.auctionhouse.entity.User;
 import com.auctionsystem.auctionhouse.mapper.UserMapper;
 import com.auctionsystem.auctionhouse.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,5 +66,13 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public boolean isUserAuthorizedToUpdate(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Optional<UserDto> existingUserDto = getUserById(id);
+        return existingUserDto.isPresent() && existingUserDto.get().getUsername().equals(currentPrincipalName);
     }
 }

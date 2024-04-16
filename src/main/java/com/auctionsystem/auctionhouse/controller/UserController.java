@@ -8,11 +8,16 @@ import org.springframework.http.HttpStatus;
 import com.auctionsystem.auctionhouse.entity.User;
 import com.auctionsystem.auctionhouse.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -35,6 +40,36 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        Optional<UserDto> userDto = userService.getUserById(id);
+        if (userDto.isPresent()) {
+            return ResponseEntity.ok(userDto.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+        }
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        if (!userService.isUserAuthorizedToUpdate(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji danych innego użytkownika");
+        }
 
+        UserDto updatedUserDto = userService.updateUser(userMapper.toEntity(userDto));
+        return ResponseEntity.ok(updatedUserDto);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!userService.isUserAuthorizedToUpdate(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia innego użytkownika");
+        }
 
+        userService.deleteUser(id);
+        return ResponseEntity.ok("Użytkownik o id " + id + " został usunięty");
+    }
 }
