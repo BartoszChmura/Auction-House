@@ -25,7 +25,7 @@ public class CategoryService {
     @Transactional
     public CategoryDto saveCategory(CategoryDto categoryDto) {
         Category category = categoryMapper.toEntity(categoryDto);
-        if(getCategoryByName(category.getCategoryName()).isPresent())
+        if(getCategoryByCategoryName(category.getCategoryName()).isPresent())
             throw new IllegalArgumentException(String.format("Category with name %s already exists", category.getCategoryName()));
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toDto(savedCategory);
@@ -43,7 +43,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Optional<CategoryDto> getCategoryByName(String categoryName) {
+    public Optional<CategoryDto> getCategoryByCategoryName(String categoryName) {
         return Optional.ofNullable(categoryRepository.getCategoryByCategoryName(categoryName))
                 .map(categoryMapper::toDto);
     }
