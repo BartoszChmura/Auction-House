@@ -43,6 +43,7 @@ public class Item {
 
     private double currentPrice;
 
+    @CreationTimestamp
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;

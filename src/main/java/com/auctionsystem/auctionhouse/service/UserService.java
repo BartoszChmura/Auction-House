@@ -29,15 +29,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto saveUser(User user) {
-        if (user.getUsername() == null || user.getPasswordHash() == null) {
+    public UserDto saveUser(UserDto userDto) {
+        if (userDto.getUsername() == null || userDto.getPassword() == null) {
             throw new IllegalArgumentException("Nazwa użytkownika i hasło są wymagane");
         }
-        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        Optional<User> existingUser = userRepository.findByUsername(userDto.getUsername());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("Użytkownik o takiej nazwie już istnieje");
         }
-        String encodedPassword = passwordEncoder.encode(user.getPasswordHash());
+        User user = userMapper.toEntity(userDto);
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         user.setPasswordHash(encodedPassword);
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
@@ -50,6 +51,17 @@ public class UserService {
     }
 
     @Transactional
+    public Optional<UserDto> getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(userMapper::toDto);
+    }
+
+    @Transactional
+    public Optional<User> getUserEntityByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Transactional
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -58,10 +70,27 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(User user) {
-        User updatedUser = userRepository.save(user);
+    public UserDto updateUser(UserDto userDto) {
+        User existingUser = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym ID"));
+
+        if (userDto.getUsername() != null && !userDto.getUsername().isEmpty()) {
+            existingUser.setUsername(userDto.getUsername());
+        }
+
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
+            existingUser.setEmail(userDto.getEmail());
+        }
+
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            existingUser.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
+        }
+
+        User updatedUser = userRepository.save(existingUser);
         return userMapper.toDto(updatedUser);
     }
+
+
 
     @Transactional
     public void deleteUser(Long id) {

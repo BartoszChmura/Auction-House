@@ -28,12 +28,10 @@ public class UserController {
         this.userService = userService;
         this.userMapper = userMapper;
     }
-    @RequestMapping("/register")
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
         try {
-            User user = userMapper.toEntity(userDto);
-            UserDto savedUser = userService.saveUser(user);
+            UserDto savedUser = userService.saveUser(userDto);
             return ResponseEntity.ok(savedUser);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -60,7 +58,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji danych innego użytkownika");
         }
 
-        UserDto updatedUserDto = userService.updateUser(userMapper.toEntity(userDto));
+        UserDto updatedUserDto = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
     @DeleteMapping("/{id}")
