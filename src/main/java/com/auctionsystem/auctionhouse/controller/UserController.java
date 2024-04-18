@@ -58,6 +58,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji danych innego użytkownika");
         }
 
+        userDto.setId(id);
         UserDto updatedUserDto = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUserDto);
     }

@@ -57,9 +57,7 @@ public class ItemService {
         item.setSeller(seller);
         item.setWinner(null);
         item.setCategory(category);
-        item.setStartPrice(itemDto.getStartPrice());
         item.setCurrentPrice(itemDto.getStartPrice());
-        item.setStartTime(LocalDateTime.now());
         item.setStatus("active");
 
         Item savedItem = itemRepository.save(item);
