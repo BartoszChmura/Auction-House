@@ -79,13 +79,43 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemDto updateItem(Item item) {
-        Item updatedItem = itemRepository.save(item);
+    public ItemDto updateItem(ItemDto itemDto) {
+        Item existingItem = itemRepository.findById(itemDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono przedmiotu z takim ID"));
+
+        if (itemDto.getTitle() != null && !itemDto.getTitle().isEmpty()) {
+            existingItem.setTitle(itemDto.getTitle());
+        }
+
+        if (itemDto.getDescription() != null && !itemDto.getDescription().isEmpty()) {
+            existingItem.setDescription(itemDto.getDescription());
+        }
+
+        if (itemDto.getEndTime() != null && itemDto.getEndTime().isAfter(LocalDateTime.now())) {
+            existingItem.setEndTime(itemDto.getEndTime());
+        }
+
+        Item updatedItem = itemRepository.save(existingItem);
         return itemMapper.toDto(updatedItem);
+
+
     }
 
     @Transactional
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
+    }
+
+    public boolean isUserAuthorizedToUpdateItem(Long id) {
+
+        Optional<ItemDto> itemDto = getItemById(id);
+        if (itemDto.isEmpty()) {
+            throw new IllegalArgumentException("Item not found");
+        }
+
+        Long sellerId = itemDto.get().getSellerId();
+
+        return userService.isUserAuthorizedToUpdate(sellerId);
+
     }
 }
