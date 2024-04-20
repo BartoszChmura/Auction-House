@@ -2,6 +2,7 @@ package com.auctionsystem.auctionhouse.service;
 
 import com.auctionsystem.auctionhouse.dto.CategoryDto;
 import com.auctionsystem.auctionhouse.entity.Category;
+import com.auctionsystem.auctionhouse.entity.Item;
 import com.auctionsystem.auctionhouse.mapper.CategoryMapper;
 import com.auctionsystem.auctionhouse.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class CategoryService {
     public CategoryDto saveCategory(CategoryDto categoryDto) {
         Category category = categoryMapper.toEntity(categoryDto);
         if(getCategoryByCategoryName(category.getCategoryName()).isPresent())
-            throw new IllegalArgumentException(String.format("Category with name %s already exists", category.getCategoryName()));
+            throw new IllegalArgumentException(String.format("Kategoria %s już istnieje", category.getCategoryName()));
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toDto(savedCategory);
     }
@@ -57,9 +58,17 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto updateCategory(Category category) {
-        Category updatedCategory = categoryRepository.save(category);
+    public CategoryDto updateCategory(CategoryDto categoryDto) {
+        Category existingCategory = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono kategorii z takim ID"));
+
+        if (categoryDto.getCategoryName() != null || !categoryDto.getCategoryName().isEmpty()) {
+            existingCategory.setCategoryName(categoryDto.getCategoryName());
+        }
+
+        Category updatedCategory = categoryRepository.save(existingCategory);
         return categoryMapper.toDto(updatedCategory);
+
     }
 
     @Transactional

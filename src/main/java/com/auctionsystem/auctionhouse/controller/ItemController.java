@@ -18,23 +18,20 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    private final ItemMapper itemMapper;
+
 
     @Autowired
-    public ItemController(ItemService itemService, ItemMapper itemMapper) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
-        this.itemMapper = itemMapper;
     }
 
-    @RequestMapping("/add")
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> addItem(@RequestBody ItemDto itemDto) {
             ItemDto savedItem = itemService.saveItem(itemDto);
             return ResponseEntity.ok(savedItem);
     }
 
-    @RequestMapping("/all")
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ItemDto>> getAllItems() {
         List<ItemDto> items = itemService.getAllItems();
         return ResponseEntity.ok(items);
@@ -62,6 +59,10 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteItem(@PathVariable Long id) {
+        Optional<ItemDto> existingItem = itemService.getItemById(id);
+        if (existingItem.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+        }
         if (!itemService.isUserAuthorizedToUpdateItem(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia czyjegoś przedmiotu");
         }

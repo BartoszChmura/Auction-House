@@ -22,11 +22,12 @@ public class UserController {
 
     private final UserService userService;
 
-    private final UserMapper userMapper;
 
-    public UserController(UserService userService, UserMapper userMapper) {
+
+    @Autowired
+
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
@@ -64,6 +65,10 @@ public class UserController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        Optional<UserDto> existingUser = userService.getUserById(id);
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+        }
         if (!userService.isUserAuthorizedToUpdate(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia innego użytkownika");
         }

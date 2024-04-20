@@ -4,6 +4,7 @@ import com.auctionsystem.auctionhouse.dto.JwtRequest;
 import com.auctionsystem.auctionhouse.dto.JwtResponse;
 import com.auctionsystem.auctionhouse.service.JwtUserDetailsService;
 import com.auctionsystem.auctionhouse.service.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +20,7 @@ public class JwtAuthenticationController {
     private final JwtUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
+    @Autowired
     public JwtAuthenticationController(AuthenticationManager authenticationManager, JwtUserDetailsService userDetailsService, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;

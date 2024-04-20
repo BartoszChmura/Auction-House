@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +30,8 @@ public class Bid {
     @JoinColumn(name = "bidderid", referencedColumnName = "userid")
     private User bidder;
 
-    private double bidAmount;
+    private Double bidAmount;
 
+    @CreationTimestamp
     private LocalDateTime bidTime;
 }

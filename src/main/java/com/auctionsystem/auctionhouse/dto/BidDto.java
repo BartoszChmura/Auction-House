@@ -20,7 +20,7 @@ public class BidDto {
 
     private Long bidderId;
 
-    private double bidAmount;
+    private Double bidAmount;
 
     private LocalDateTime bidTime;
 }

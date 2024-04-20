@@ -1,9 +1,14 @@
 package com.auctionsystem.auctionhouse.service;
 
 import com.auctionsystem.auctionhouse.dto.BidDto;
+import com.auctionsystem.auctionhouse.dto.ItemDto;
 import com.auctionsystem.auctionhouse.entity.Bid;
+import com.auctionsystem.auctionhouse.entity.User;
 import com.auctionsystem.auctionhouse.mapper.BidMapper;
 import com.auctionsystem.auctionhouse.repository.BidRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +21,37 @@ public class BidService {
 
     private final BidRepository bidRepository;
     private final BidMapper bidMapper;
+    private final ItemService itemService;
+    private final UserService userService;
 
-    public BidService(BidRepository bidRepository, BidMapper bidMapper) {
+    @Autowired
+    public BidService(BidRepository bidRepository, BidMapper bidMapper, ItemService itemService, UserService userService) {
         this.bidRepository = bidRepository;
         this.bidMapper = bidMapper;
+        this.itemService = itemService;
+        this.userService = userService;
     }
 
     @Transactional
-    public BidDto saveBid(Bid bid) {
+    public BidDto saveBid(BidDto bidDto) {
+        Optional<ItemDto> existingItem = itemService.getItemById(bidDto.getItemId());
+        if (existingItem.isEmpty()) {
+            throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
+        }
+        if (bidDto.getBidAmount() == null) {
+            throw new IllegalArgumentException("Kwota nie może być pusta");
+        }
+        if (bidDto.getBidAmount() <= 0 || bidDto.getBidAmount() <= existingItem.get().getCurrentPrice()) {
+            throw new IllegalArgumentException("Kwota musi być wyższa niż aktualna cena przedmiotu");
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User bidder = userService.getUserEntityByUsername(username).orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje"));
+        Bid bid = bidMapper.toEntity(bidDto);
+        bid.setBidder(bidder);
         Bid savedBid = bidRepository.save(bid);
         return bidMapper.toDto(savedBid);
+
     }
 
     @Transactional
@@ -43,13 +69,19 @@ public class BidService {
     }
 
     @Transactional
-    public BidDto updateBid(Bid bid) {
-        Bid updatedBid = bidRepository.save(bid);
-        return bidMapper.toDto(updatedBid);
-    }
-
-    @Transactional
     public void deleteBid(Long id) {
         bidRepository.deleteById(id);
+    }
+
+    public boolean isUserAuthorizedToUpdateBid(Long id) {
+        Optional<BidDto> bidDto = getBidById(id);
+        if (bidDto.isEmpty()) {
+            throw new IllegalArgumentException("Bid o id " + id + " nie istnieje");
+        }
+
+        Long bidderId = bidDto.get().getBidderId();
+
+        return userService.isUserAuthorizedToUpdate(bidderId);
+
     }
 }
