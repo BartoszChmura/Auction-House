@@ -38,6 +38,21 @@ public class BidController {
         }
     }
 
+    @GetMapping("/winner/{itemId}")
+    public ResponseEntity<?> getWinnerBidByItemId(@PathVariable Long itemId) {
+        Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(itemId);
+        if (winnerBid.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nie ma zwycięzcy na przedmiot o id " + itemId);
+        }
+        return ResponseEntity.ok(winnerBid.get());
+    }
+
+    @GetMapping("/item/{itemId}")
+    public ResponseEntity<?> getBidsByItemId(@PathVariable Long itemId) {
+        List<BidDto> bids = bidService.getBidsByItemId(itemId);
+        return ResponseEntity.ok(bids);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<BidDto>> getAllBids() {
         List<BidDto> bids = bidService.getAllBids();

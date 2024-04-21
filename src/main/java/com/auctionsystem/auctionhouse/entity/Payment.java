@@ -25,7 +25,7 @@ public class Payment {
     @JoinColumn(name = "bidid", referencedColumnName = "bidid")
     private Bid bid;
 
-    private double amount;
+    private Double amount;
 
     private String paymentStatus;
 

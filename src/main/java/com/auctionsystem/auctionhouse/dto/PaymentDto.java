@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,8 +18,9 @@ public class PaymentDto {
 
     private Long bidId;
 
-    private double amount;
+    private Double amount;
 
+    @CreationTimestamp
     private LocalDateTime paymentDate;
 
     private String paymentStatus;

@@ -62,6 +62,11 @@ public class UserService {
     }
 
     @Transactional
+    public Optional<User> getUserEntityById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Transactional
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()

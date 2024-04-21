@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,9 @@ public class BidService {
         Optional<ItemDto> existingItem = itemService.getItemById(bidDto.getItemId());
         if (existingItem.isEmpty()) {
             throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
+        }
+        if (!existingItem.get().getStatus().equals("active")) {
+            throw new IllegalArgumentException("Licytacja musi być aktywna");
         }
         if (bidDto.getBidAmount() == null) {
             throw new IllegalArgumentException("Kwota nie może być pusta");
@@ -66,6 +70,23 @@ public class BidService {
         return bids.stream()
                 .map(bidMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<BidDto> getBidsByItemId(Long itemId) {
+        List<Bid> bids = bidRepository.getBidsByItemId(itemId);
+        return bids.stream()
+                .map(bidMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Optional<BidDto> getWinnerBidByItemId(Long itemId) {
+        List<BidDto> bids = getBidsByItemId(itemId);
+        if (bids.isEmpty()) {
+            throw new NoSuchElementException("Nie ma ofert dla przedmiotu o id " + itemId);
+        }
+        return Optional.ofNullable(bids.getLast());
     }
 
     @Transactional

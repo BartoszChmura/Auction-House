@@ -1,5 +1,6 @@
 package com.auctionsystem.auctionhouse.service;
 
+import com.auctionsystem.auctionhouse.dto.BidDto;
 import com.auctionsystem.auctionhouse.dto.CategoryDto;
 import com.auctionsystem.auctionhouse.dto.ItemDto;
 import com.auctionsystem.auctionhouse.dto.UserDto;
@@ -28,13 +29,16 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
     private final UserService userService;
+
+    private final BidService bidService;
     private final CategoryService categoryService;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, ItemMapper itemMapper, UserService userService, CategoryService categoryService) {
+    public ItemService(ItemRepository itemRepository, ItemMapper itemMapper, UserService userService, BidService bidService, CategoryService categoryService) {
         this.itemRepository = itemRepository;
         this.itemMapper = itemMapper;
         this.userService = userService;
+        this.bidService = bidService;
         this.categoryService = categoryService;
 
     }
@@ -117,5 +121,21 @@ public class ItemService {
 
         return userService.isUserAuthorizedToUpdate(sellerId);
 
+    }
+
+    @Transactional
+    public void endAuction(Long id) {
+        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Przedmiot o id " + id + " nie istnieje"));
+        if(!item.getStatus().equals("active")) {
+            throw new IllegalArgumentException("Aukcja jest już zakończona");
+        }
+        Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(id);
+        if (winnerBid.isEmpty()) {
+            item.setStatus("expired");
+        }
+        else {
+            item.setWinner(userService.getUserEntityById(winnerBid.get().getBidderId()).orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje")));
+            item.setStatus("waiting for payment");
+        }
     }
 }
