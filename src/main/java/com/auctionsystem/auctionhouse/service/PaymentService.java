@@ -2,7 +2,9 @@ package com.auctionsystem.auctionhouse.service;
 
 import com.auctionsystem.auctionhouse.dto.*;
 import com.auctionsystem.auctionhouse.entity.Bid;
+import com.auctionsystem.auctionhouse.entity.Item;
 import com.auctionsystem.auctionhouse.entity.Payment;
+import com.auctionsystem.auctionhouse.mapper.ItemMapper;
 import com.auctionsystem.auctionhouse.mapper.PaymentMapper;
 import com.auctionsystem.auctionhouse.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,13 +32,15 @@ public class PaymentService {
     private final BidService bidService;
     private final ItemService itemService;
     private final PaymentMapper paymentMapper;
+    private final ItemMapper itemMapper;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, BidService bidService, ItemService itemService, PaymentMapper paymentMapper) {
+    public PaymentService(PaymentRepository paymentRepository, BidService bidService, ItemService itemService, PaymentMapper paymentMapper, ItemMapper itemMapper) {
         this.paymentRepository = paymentRepository;
         this.bidService = bidService;
         this.itemService = itemService;
         this.paymentMapper = paymentMapper;
+        this.itemMapper = itemMapper;
     }
 
     private final String clientId = "478097";
@@ -73,6 +77,11 @@ public class PaymentService {
             Optional<Bid> winningBid = bidService.getBidEntityById(winningBidId);
             if (winningBid.isEmpty()) {
                 throw new EntityNotFoundException("Nie znaleziono wygranej licytacji");
+            }
+
+            Item item = winningBid.get().getItem();
+            if (!item.getStatus().equals("oczekuje na płatność")) {
+                throw new IllegalArgumentException("Aukcja jeszcze się nie zakończyła");
             }
 
             PaymentRequest.Product product = new PaymentRequest.Product();
@@ -122,7 +131,19 @@ public class PaymentService {
         public void updatePaymentStatus (PaymentNotification notification){
             Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrder().getOrderId());
             existingPayment.setPaymentStatus(notification.getOrder().getStatus());
+            if (existingPayment.getPaymentStatus().equals("COMPLETED")) {
+                finishPayment(existingPayment);
+            }
             paymentRepository.save(existingPayment);
+        }
+
+        public void finishPayment (Payment payment) {
+            Optional<Item> existingItem = itemService.getItemEntityById(payment.getBid().getItem().getId());
+            if (existingItem.isEmpty()) {
+                throw new EntityNotFoundException("Nie znaleziono przedmiotu");
+            }
+            existingItem.get().setStatus("sprzedano");
+            itemService.updateItem(itemMapper.toDto(existingItem.get()));
         }
     }
 

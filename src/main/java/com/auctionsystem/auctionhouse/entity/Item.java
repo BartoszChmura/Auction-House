@@ -39,9 +39,9 @@ public class Item {
 
     private String description;
 
-    private double startPrice;
+    private Double startPrice;
 
-    private double currentPrice;
+    private Double currentPrice;
 
     @CreationTimestamp
     private LocalDateTime startTime;

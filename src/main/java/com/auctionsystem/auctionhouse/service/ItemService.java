@@ -57,7 +57,7 @@ public class ItemService {
         item.setWinner(null);
         item.setCategory(category);
         item.setCurrentPrice(itemDto.getStartPrice());
-        item.setStatus("active");
+        item.setStatus("aktywna");
 
         Item savedItem = itemRepository.save(item);
         return itemMapper.toDto(savedItem);
@@ -72,15 +72,20 @@ public class ItemService {
     }
 
     @Transactional
+    public List<Item> getAllItemsEntity() {
+        return itemRepository.findAll();
+    }
+
+    @Transactional
     public Optional<ItemDto> getItemById(Long id) {
         return itemRepository.findById(id)
                 .map(itemMapper::toDto);
     }
 
     @Transactional
-    public Optional<ItemDto> getItemEntityById(Long id) {
-        return itemRepository.findById(id)
-                .map(itemMapper::toDto);
+    public Optional<Item> getItemEntityById(Long id) {
+        return itemRepository.findById(id);
+
     }
 
     @Transactional
@@ -115,7 +120,7 @@ public class ItemService {
 
         Optional<ItemDto> itemDto = getItemById(id);
         if (itemDto.isEmpty()) {
-            throw new IllegalArgumentException("Item not found");
+            throw new IllegalArgumentException("Nie znaleziono przedmiotu o id " + id);
         }
 
         Long sellerId = itemDto.get().getSellerId();
@@ -125,18 +130,33 @@ public class ItemService {
     }
 
     @Transactional
+    public ItemDto updateCurrentPrice(ItemDto itemDto) {
+        Item existingItem = itemRepository.findById(itemDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono przedmiotu z takim ID"));
+
+        if (itemDto.getCurrentPrice() != null && itemDto.getCurrentPrice() > existingItem.getCurrentPrice()) {
+            existingItem.setCurrentPrice(itemDto.getCurrentPrice());
+        }
+
+        Item updatedItem = itemRepository.save(existingItem);
+        return itemMapper.toDto(updatedItem);
+    }
+
+    @Transactional
     public void endAuction(Long id) {
         Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Przedmiot o id " + id + " nie istnieje"));
-        if(!item.getStatus().equals("active")) {
+        if(!item.getStatus().equals("aktywna")) {
             throw new IllegalArgumentException("Aukcja jest już zakończona");
         }
         Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(id);
         if (winnerBid.isEmpty()) {
-            item.setStatus("expired");
+            item.setStatus("nie sprzedano");
         }
         else {
             item.setWinner(userService.getUserEntityById(winnerBid.get().getBidderId()).orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje")));
-            item.setStatus("waiting for payment");
+            item.setStatus("oczekuje na płatność");
         }
+        itemRepository.save(item);
     }
+
 }

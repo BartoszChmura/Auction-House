@@ -3,8 +3,10 @@ package com.auctionsystem.auctionhouse.service;
 import com.auctionsystem.auctionhouse.dto.BidDto;
 import com.auctionsystem.auctionhouse.dto.ItemDto;
 import com.auctionsystem.auctionhouse.entity.Bid;
+import com.auctionsystem.auctionhouse.entity.Item;
 import com.auctionsystem.auctionhouse.entity.User;
 import com.auctionsystem.auctionhouse.mapper.BidMapper;
+import com.auctionsystem.auctionhouse.mapper.ItemMapper;
 import com.auctionsystem.auctionhouse.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,13 +27,15 @@ public class BidService {
     private final BidMapper bidMapper;
     private final ItemService itemService;
     private final UserService userService;
+    private final ItemMapper itemMapper;
 
     @Autowired
-    public BidService(BidRepository bidRepository, BidMapper bidMapper, @Lazy ItemService itemService, UserService userService) {
+    public BidService(BidRepository bidRepository, BidMapper bidMapper, @Lazy ItemService itemService, UserService userService, ItemMapper itemMapper) {
         this.bidRepository = bidRepository;
         this.bidMapper = bidMapper;
         this.itemService = itemService;
         this.userService = userService;
+        this.itemMapper = itemMapper;
     }
 
     @Transactional
@@ -40,7 +44,7 @@ public class BidService {
         if (existingItem.isEmpty()) {
             throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
         }
-        if (!existingItem.get().getStatus().equals("active")) {
+        if (!existingItem.get().getStatus().equals("aktywna")) {
             throw new IllegalArgumentException("Licytacja musi być aktywna");
         }
         if (bidDto.getBidAmount() == null) {
@@ -55,6 +59,11 @@ public class BidService {
         Bid bid = bidMapper.toEntity(bidDto);
         bid.setBidder(bidder);
         Bid savedBid = bidRepository.save(bid);
+
+        existingItem.get().setCurrentPrice(bidDto.getBidAmount());
+        itemService.updateCurrentPrice(existingItem.get());
+
+
         return bidMapper.toDto(savedBid);
 
     }
@@ -90,9 +99,10 @@ public class BidService {
     public Optional<BidDto> getWinnerBidByItemId(Long itemId) {
         List<BidDto> bids = getBidsByItemId(itemId);
         if (bids.isEmpty()) {
-            throw new NoSuchElementException("Nie ma ofert dla przedmiotu o id " + itemId);
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(bids.getLast());
         }
-        return Optional.ofNullable(bids.getLast());
     }
 
     @Transactional

@@ -25,9 +25,9 @@ public class ItemDto {
 
     private String description;
 
-    private double startPrice;
+    private Double startPrice;
 
-    private double currentPrice;
+    private Double currentPrice;
 
     private LocalDateTime startTime;
 
