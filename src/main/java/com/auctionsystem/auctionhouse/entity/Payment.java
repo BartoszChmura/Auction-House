@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,6 +30,7 @@ public class Payment {
 
     private String paymentStatus;
 
+    @CreationTimestamp
     private LocalDateTime paymentDate;
 
     private String transactionId;

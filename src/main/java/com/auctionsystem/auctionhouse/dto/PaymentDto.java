@@ -20,7 +20,6 @@ public class PaymentDto {
 
     private Double amount;
 
-    @CreationTimestamp
     private LocalDateTime paymentDate;
 
     private String paymentStatus;

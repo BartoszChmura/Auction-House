@@ -7,6 +7,7 @@ import com.auctionsystem.auctionhouse.entity.User;
 import com.auctionsystem.auctionhouse.mapper.BidMapper;
 import com.auctionsystem.auctionhouse.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class BidService {
     private final UserService userService;
 
     @Autowired
-    public BidService(BidRepository bidRepository, BidMapper bidMapper, ItemService itemService, UserService userService) {
+    public BidService(BidRepository bidRepository, BidMapper bidMapper, @Lazy ItemService itemService, UserService userService) {
         this.bidRepository = bidRepository;
         this.bidMapper = bidMapper;
         this.itemService = itemService;
@@ -62,6 +63,11 @@ public class BidService {
     public Optional<BidDto> getBidById(Long id) {
         return bidRepository.findById(id)
                 .map(bidMapper::toDto);
+    }
+
+    @Transactional
+    public Optional<Bid> getBidEntityById(Long id) {
+        return bidRepository.findById(id);
     }
 
     @Transactional
