@@ -2,7 +2,6 @@ package com.auctionsystem.auctionhouse.service;
 
 import com.auctionsystem.auctionhouse.dto.CategoryDto;
 import com.auctionsystem.auctionhouse.entity.Category;
-import com.auctionsystem.auctionhouse.entity.Item;
 import com.auctionsystem.auctionhouse.mapper.CategoryMapper;
 import com.auctionsystem.auctionhouse.repository.CategoryRepository;
 import org.springframework.stereotype.Service;

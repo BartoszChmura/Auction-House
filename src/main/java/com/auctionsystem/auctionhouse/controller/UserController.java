@@ -1,16 +1,10 @@
 package com.auctionsystem.auctionhouse.controller;
 
 import com.auctionsystem.auctionhouse.dto.UserDto;
-import com.auctionsystem.auctionhouse.mapper.UserMapper;
 import com.auctionsystem.auctionhouse.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import com.auctionsystem.auctionhouse.entity.User;
-import com.auctionsystem.auctionhouse.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

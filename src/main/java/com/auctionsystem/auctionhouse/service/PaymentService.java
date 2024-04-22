@@ -48,7 +48,6 @@ public class PaymentService {
 
 
     public OAuthTokenResponse createOAuthToken() {
-        log.info("Tworzenie tokenu");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -62,18 +61,14 @@ public class PaymentService {
 
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
 
-        log.info("Odpowiedź z serwera: {}", response.getBody());
-
         try {
             return objectMapper.readValue(response.getBody(), OAuthTokenResponse.class);
         } catch (Exception e) {
-            log.error("Nie udało się uzyskać tokenu", e);
             throw new RuntimeException("Nie udało się uzyskać tokenu", e);
         }
     }
 
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest, Long winningBidId) {
-        log.info("inicjowanie płatności");
         try {
             Optional<Bid> winningBid = bidService.getBidEntityById(winningBidId);
             if (winningBid.isEmpty()) {
@@ -97,7 +92,6 @@ public class PaymentService {
             paymentRequest.setTotalAmount(String.valueOf(bidAmountInPennies));
 
             OAuthTokenResponse tokenResponse = createOAuthToken();
-            log.info("Token OAuth utworzony: {}", tokenResponse.getAccessToken());
 
 
             RestTemplate restTemplate = new RestTemplate();
@@ -109,28 +103,25 @@ public class PaymentService {
 
             HttpEntity<PaymentRequest> request = new HttpEntity<>(paymentRequest, headers);
 
-            log.info("Wysyłanie żądania płatności");
             ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(paymentsUrl, request, PaymentResponse.class);
-            log.info("Odpowiedź na żądanie płatności: {}", response.getBody());
 
 
             Payment payment = new Payment();
             payment.setBid(winningBid.get());
             payment.setAmount(winningBid.get().getBidAmount());
             payment.setPaymentStatus("CREATED");
+            payment.setTransactionId(response.getBody().getOrderId());
 
             paymentRepository.save(payment);
 
             return response.getBody();
         } catch (Exception e) {
-            log.error("Nie udało się zainicjować płatności", e);
             throw new RuntimeException("Nie udało się zainicjować płatności", e);
         }
     }
         public void updatePaymentStatus (PaymentNotification notification){
-            log.info("Aktualizacja statusu płatności");
-            Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrderId());
-            existingPayment.setPaymentStatus(notification.getStatus());
+            Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrder().getOrderId());
+            existingPayment.setPaymentStatus(notification.getOrder().getStatus());
             paymentRepository.save(existingPayment);
         }
     }

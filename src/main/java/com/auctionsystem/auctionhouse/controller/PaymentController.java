@@ -5,12 +5,13 @@ import com.auctionsystem.auctionhouse.dto.PaymentRequest;
 import com.auctionsystem.auctionhouse.dto.PaymentResponse;
 import com.auctionsystem.auctionhouse.service.PaymentService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
@@ -23,10 +24,10 @@ public class PaymentController {
     }
 
     @PostMapping("/notify")
-    public ResponseEntity<?> receivePaymentNotification(@RequestBody PaymentNotification notification) {
+    public ResponseEntity<?> receivePaymentNotification(@RequestBody PaymentNotification paymentNotification) {
         try {
-            paymentService.updatePaymentStatus(notification);
-            return ResponseEntity.ok(notification);
+            paymentService.updatePaymentStatus(paymentNotification);
+            return ResponseEntity.ok(paymentNotification);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Nie udało się zaktualizować statusu płatności");
         }

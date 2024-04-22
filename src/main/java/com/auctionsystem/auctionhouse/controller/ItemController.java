@@ -1,8 +1,6 @@
 package com.auctionsystem.auctionhouse.controller;
 
 import com.auctionsystem.auctionhouse.dto.ItemDto;
-import com.auctionsystem.auctionhouse.dto.UserDto;
-import com.auctionsystem.auctionhouse.mapper.ItemMapper;
 import com.auctionsystem.auctionhouse.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

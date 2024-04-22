@@ -13,9 +13,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentNotification {
-    @JsonProperty("orderId")
-    private String orderId;
 
-    @JsonProperty("status")
-    private String status;
+    private Order order;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Order {
+
+        @JsonProperty("orderId")
+        private String orderId;
+
+        @JsonProperty("status")
+        private String status;
+
+    }
 }

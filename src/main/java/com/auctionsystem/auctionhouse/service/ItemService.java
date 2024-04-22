@@ -1,17 +1,12 @@
 package com.auctionsystem.auctionhouse.service;
 
 import com.auctionsystem.auctionhouse.dto.BidDto;
-import com.auctionsystem.auctionhouse.dto.CategoryDto;
 import com.auctionsystem.auctionhouse.dto.ItemDto;
-import com.auctionsystem.auctionhouse.dto.UserDto;
 import com.auctionsystem.auctionhouse.entity.Category;
 import com.auctionsystem.auctionhouse.entity.Item;
 import com.auctionsystem.auctionhouse.entity.User;
-import com.auctionsystem.auctionhouse.mapper.CategoryMapper;
 import com.auctionsystem.auctionhouse.mapper.ItemMapper;
-import com.auctionsystem.auctionhouse.mapper.UserMapper;
 import com.auctionsystem.auctionhouse.repository.ItemRepository;
-import com.auctionsystem.auctionhouse.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
