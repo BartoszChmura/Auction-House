@@ -42,6 +42,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
         }
     }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        Optional<UserDto> userDto = userService.getUserByUsername(username);
+        if (userDto.isPresent()) {
+            return ResponseEntity.ok(userDto.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o nazwie " + username + " nie istnieje");
+        }
+    }
     @GetMapping("/all")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();

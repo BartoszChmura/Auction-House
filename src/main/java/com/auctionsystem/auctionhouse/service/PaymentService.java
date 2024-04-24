@@ -45,6 +45,7 @@ public class PaymentService {
 
     private final String clientId = "478097";
     private final String clientSecret = "bd1fe53f63f17029cef465dafb0534c7";
+    private final String continueUrl = "https://ray-wired-mallard.ngrok-free.app/items";
     private final String notifyUrl = "https://ray-wired-mallard.ngrok-free.app/payment/notify";
     private final String paymentsUrl = "https://secure.snd.payu.com/api/v2_1/orders";
     private final String tokenUrl = "https://secure.snd.payu.com/pl/standard/user/oauth/authorize";
@@ -94,6 +95,7 @@ public class PaymentService {
 
             paymentRequest.setProducts(Collections.singletonList(product));
 
+            paymentRequest.setContinueUrl(continueUrl);
             paymentRequest.setNotifyUrl(notifyUrl);
             paymentRequest.setCustomerIp("192.168.1.1");
             paymentRequest.setMerchantPosId("478097");
