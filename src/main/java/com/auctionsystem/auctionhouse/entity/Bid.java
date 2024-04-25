@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,6 +30,9 @@ public class Bid {
     @ManyToOne
     @JoinColumn(name = "bidderid", referencedColumnName = "userid")
     private User bidder;
+
+    @OneToMany(mappedBy = "bid", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments;
 
     private Double bidAmount;
 
