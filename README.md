@@ -1,22 +1,19 @@
 # Auction House
 
-## Przegląd
-Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana przy użyciu Spring Boot. Aplikacja obsługuje wszystkie operacje związane z aukcjami, takie jak zarządzanie użytkownikami, tworzenie i obsługa aukcji, licytacje i przetwarzanie transakcji. Repozytorium dotyczy jedynie części backendowej.
+## Opis
+Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana głównie za pomocą frameworku Spring Boot, która umożliwia użytkownikom tworzenie, zarządzanie i licytowanie aukcji. Repozytorium na ten moment dotyczy jedynie części backendowej aplikacji.
 
 ## Funkcje
-- Rejestracja i uwierzytelnianie użytkowników
+- Rejestracja i uwierzytelnianie użytkowników za pomocą tokena JWT
 - Tworzenie i zarządzanie aukcjami
 - System licytacji
-- Obsługa transakcji
-- RESTful API
+- Zewnętrzny system płatności
 
 ## Wykorzystane Technologie
 - **Java**
-- **Spring Boot**
-- **PostgreSQL**
+- **Spring/Spring Boot**
 - **Hibernate**
-- **Spring Security**
-- **Git**
+- **PostgreSQL**
 
 ## Pierwsze Kroki
 
@@ -52,9 +49,9 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana prz
     ```
 
 4. **Dostęp do API:**
-    Serwis backendowy będzie dostępny pod adresem `http://localhost:8080`.
+    Serwis backendowy domyślnie będzie dostępny na porcie 8080.
 
 ### System płatności
 
----Do poprawnego działania systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
+---Do poprawnego działania zewnętrznego systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
 
