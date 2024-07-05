@@ -22,7 +22,6 @@ public class BidController {
     }
 
     @PostMapping
-    @RequestMapping("/add")
     public ResponseEntity<?> addBid(@RequestBody BidDto bidDto) {
         BidDto savedBid = bidService.saveBid(bidDto);
         return ResponseEntity.ok(savedBid);
