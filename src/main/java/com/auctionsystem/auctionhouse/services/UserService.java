@@ -4,6 +4,7 @@ import com.auctionsystem.auctionhouse.dtos.UserDto;
 import com.auctionsystem.auctionhouse.entities.User;
 import com.auctionsystem.auctionhouse.mappers.UserMapper;
 import com.auctionsystem.auctionhouse.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class UserService {
 
     @Transactional
     public UserDto saveUser(UserDto userDto) {
+        log.info("Próba zapisu użytkownika: {}", userDto.getUsername());
         if (userDto.getUsername() == null || userDto.getPassword() == null) {
             throw new IllegalArgumentException("Nazwa użytkownika i hasło są wymagane");
         }
@@ -41,41 +44,58 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         user.setPasswordHash(encodedPassword);
         User savedUser = userRepository.save(user);
+        log.info("Użytkownik zapisany pomyślnie: {}", userDto.getUsername());
         return userMapper.toDto(savedUser);
     }
 
     @Transactional
     public Optional<UserDto> getUserById(Long id) {
-        return userRepository.findById(id)
+        log.info("Pobieranie użytkownika o id: {}", id);
+        Optional<UserDto> result = userRepository.findById(id)
                 .map(userMapper::toDto);
+        log.info("Pobrano użytkownika o id: {}", id);
+        return result;
     }
 
     @Transactional
     public Optional<UserDto> getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+        log.info("Pobieranie użytkownika o nazwie: {}", username);
+        Optional<UserDto> result = userRepository.findByUsername(username)
                 .map(userMapper::toDto);
+        log.info("Pobrano użytkownika o nazwie: {}", username);
+        return result;
     }
 
     @Transactional
     public Optional<User> getUserEntityByUsername(String username) {
-        return userRepository.findByUsername(username);
+        log.info("Pobieranie encji użytkownika o nazwie: {}", username);
+        Optional<User> result = userRepository.findByUsername(username);
+        log.info("Pobrano encję użytkownika o nazwie: {}", username);
+        return result;
     }
 
     @Transactional
     public Optional<User> getUserEntityById(Long id) {
-        return userRepository.findById(id);
+        log.info("Pobieranie encji użytkownika o id: {}", id);
+        Optional<User> result = userRepository.findById(id);
+        log.info("Pobrano encję użytkownika o id: {}", id);
+        return result;
     }
 
     @Transactional
     public List<UserDto> getAllUsers() {
+        log.info("Pobieranie wszystkich użytkowników");
         List<User> users = userRepository.findAll();
-        return users.stream()
+        List<UserDto> result = users.stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
+        log.info("Pobrano wszystkich użytkowników");
+        return result;
     }
 
     @Transactional
     public UserDto updateUser(UserDto userDto) {
+        log.info("Aktualizacja użytkownika o id: {}", userDto.getId());
         User existingUser = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym ID"));
 
@@ -92,21 +112,25 @@ public class UserService {
         }
 
         User updatedUser = userRepository.save(existingUser);
+        log.info("Użytkownik zaktualizowany pomyślnie o id: {}", userDto.getId());
         return userMapper.toDto(updatedUser);
     }
 
-
-
     @Transactional
     public void deleteUser(Long id) {
+        log.info("Usuwanie użytkownika o id: {}", id);
         userRepository.deleteById(id);
+        log.info("Użytkownik o id {} został pomyślnie usunięty", id);
     }
 
     public boolean isUserAuthorizedToUpdate(Long id) {
+        log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji użytkownika o id: {}", id);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
         Optional<UserDto> existingUserDto = getUserById(id);
-        return existingUserDto.isPresent() && existingUserDto.get().getUsername().equals(currentPrincipalName);
+        boolean isAuthorized = existingUserDto.isPresent() && existingUserDto.get().getUsername().equals(currentPrincipalName);
+        log.info("Użytkownik jest {} do aktualizacji użytkownika o id: {}", isAuthorized ? "upoważniony" : "nieupoważniony", id);
+        return isAuthorized;
     }
 }

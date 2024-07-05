@@ -4,6 +4,7 @@ import com.auctionsystem.auctionhouse.dtos.CategoryDto;
 import com.auctionsystem.auctionhouse.entities.Category;
 import com.auctionsystem.auctionhouse.mappers.CategoryMapper;
 import com.auctionsystem.auctionhouse.repositories.CategoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -24,54 +26,72 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto saveCategory(CategoryDto categoryDto) {
+        log.info("Zapisywanie kategorii");
         Category category = categoryMapper.toEntity(categoryDto);
-        if(getCategoryByCategoryName(category.getCategoryName()).isPresent())
+        if (getCategoryByCategoryName(category.getCategoryName()).isPresent()) {
             throw new IllegalArgumentException(String.format("Kategoria %s już istnieje", category.getCategoryName()));
+        }
         Category savedCategory = categoryRepository.save(category);
+        log.info("Zapisano kategorie");
         return categoryMapper.toDto(savedCategory);
     }
 
     @Transactional
     public Optional<CategoryDto> getCategoryById(Long id) {
-        return categoryRepository.findById(id)
+        log.info("Pobieranie kategorii o id: {}", id);
+        Optional<CategoryDto> result = categoryRepository.findById(id)
                 .map(categoryMapper::toDto);
+        log.info("Pobrano kategorię o id: {}", id);
+        return result;
     }
 
     @Transactional
     public Optional<Category> getCategoryEntityById(Long id) {
-        return categoryRepository.findById(id);
+        log.info("Pobieranie encji kategorii o id: {}", id);
+        Optional<Category> result = categoryRepository.findById(id);
+        log.info("Pobrano encję kategorii o id: {}", id);
+        return result;
     }
 
     @Transactional
     public Optional<CategoryDto> getCategoryByCategoryName(String categoryName) {
-        return Optional.ofNullable(categoryRepository.getCategoryByCategoryName(categoryName))
+        log.info("Pobieranie kategorii o nazwie: {}", categoryName);
+        Optional<CategoryDto> result = Optional.ofNullable(categoryRepository.getCategoryByCategoryName(categoryName))
                 .map(categoryMapper::toDto);
+        log.info("Pobrano kategorię o nazwie: {}", categoryName);
+        return result;
     }
 
     @Transactional
     public List<CategoryDto> getAllCategories() {
+        log.info("Pobieranie wszystkich kategorii");
         List<Category> categories = categoryRepository.findAll();
-        return categories.stream()
+        List<CategoryDto> result = categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
+        log.info("Pobrano wszystkie kategorie");
+        return result;
     }
 
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto) {
+        log.info("Aktualizacja kategorii: {}", categoryDto);
         Category existingCategory = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono kategorii z takim ID"));
 
-        if (categoryDto.getCategoryName() != null || !categoryDto.getCategoryName().isEmpty()) {
+        if (categoryDto.getCategoryName() != null && !categoryDto.getCategoryName().isEmpty()) {
             existingCategory.setCategoryName(categoryDto.getCategoryName());
         }
 
         Category updatedCategory = categoryRepository.save(existingCategory);
+        log.info("Kategoria zaktualizowana pomyślnie: {}", updatedCategory);
         return categoryMapper.toDto(updatedCategory);
-
     }
 
     @Transactional
     public void deleteCategory(Long id) {
+        log.info("Usuwanie kategorii o id: {}", id);
         categoryRepository.deleteById(id);
+        log.info("Kategoria o id {} została pomyślnie usunięta", id);
     }
 }

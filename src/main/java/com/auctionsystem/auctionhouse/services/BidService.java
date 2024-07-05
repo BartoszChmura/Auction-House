@@ -7,6 +7,7 @@ import com.auctionsystem.auctionhouse.entities.User;
 import com.auctionsystem.auctionhouse.mappers.BidMapper;
 import com.auctionsystem.auctionhouse.mappers.ItemMapper;
 import com.auctionsystem.auctionhouse.repositories.BidRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BidService {
 
     private final BidRepository bidRepository;
@@ -38,6 +40,7 @@ public class BidService {
 
     @Transactional
     public BidDto saveBid(BidDto bidDto) {
+        log.info("Zapisywanie oferty");
         Optional<ItemDto> existingItem = itemService.getItemById(bidDto.getItemId());
         if (existingItem.isEmpty()) {
             throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
@@ -60,7 +63,7 @@ public class BidService {
 
         existingItem.get().setCurrentPrice(bidDto.getBidAmount());
         itemService.updateCurrentPrice(existingItem.get());
-
+        log.info("Zapisano ofertę");
 
         return bidMapper.toDto(savedBid);
 
@@ -68,55 +71,73 @@ public class BidService {
 
     @Transactional
     public Optional<BidDto> getBidById(Long id) {
-        return bidRepository.findById(id)
+        log.info("Pobieranie oferty o id: {}", id);
+        Optional<BidDto> result = bidRepository.findById(id)
                 .map(bidMapper::toDto);
+        log.info("Pobrano ofertę o id: {}", id);
+        return result;
     }
 
     @Transactional
     public Optional<Bid> getBidEntityById(Long id) {
-        return bidRepository.findById(id);
+        log.info("Pobieranie encji oferty o id: {}", id);
+        Optional<Bid> result = bidRepository.findById(id);
+        log.info("Pobrano encję oferty o id: {}", id);
+        return result;
     }
 
     @Transactional
     public List<BidDto> getAllBids() {
+        log.info("Pobieranie wszystkich ofert");
         List<Bid> bids = bidRepository.findAll();
-        return bids.stream()
+        List<BidDto> result = bids.stream()
                 .map(bidMapper::toDto)
                 .collect(Collectors.toList());
+        log.info("Pobrano wszystkie oferty");
+        return result;
     }
 
     @Transactional
     public List<BidDto> getBidsByItemId(Long itemId) {
+        log.info("Pobieranie ofert dla przedmiotu o id: {}", itemId);
         List<Bid> bids = bidRepository.getBidsByItemId(itemId);
-        return bids.stream()
+        List<BidDto> result = bids.stream()
                 .map(bidMapper::toDto)
                 .collect(Collectors.toList());
+        log.info("Pobrano oferty dla przedmiotu o id: {}", itemId);
+        return result;
     }
 
     @Transactional
     public Optional<BidDto> getWinnerBidByItemId(Long itemId) {
+        log.info("Pobieranie zwycięskiej oferty dla przedmiotu o id: {}", itemId);
         List<BidDto> bids = getBidsByItemId(itemId);
         if (bids.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(bids.getLast());
+            Optional<BidDto> result = Optional.ofNullable(bids.getLast());
+            log.info("Pobrano zwycięską ofertę dla przedmiotu o id: {}", itemId);
+            return result;
         }
     }
 
     @Transactional
     public void deleteBid(Long id) {
+        log.info("Usuwanie oferty o id: {}", id);
         bidRepository.deleteById(id);
+        log.info("Oferta o id {} została pomyślnie usunięta", id);
     }
 
     public boolean isUserAuthorizedToUpdateBid(Long id) {
+        log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji oferty o id: {}", id);
         Optional<BidDto> bidDto = getBidById(id);
         if (bidDto.isEmpty()) {
-            throw new IllegalArgumentException("Bid o id " + id + " nie istnieje");
+            throw new IllegalArgumentException("Oferta o id " + id + " nie istnieje");
         }
 
         Long bidderId = bidDto.get().getBidderId();
-
-        return userService.isUserAuthorizedToUpdate(bidderId);
-
+        boolean isAuthorized = userService.isUserAuthorizedToUpdate(bidderId);
+        log.info("Użytkownik {} jest {} do aktualizacji oferty o id: {}", bidderId, isAuthorized ? "upoważniony" : "nieupoważniony", id);
+        return isAuthorized;
     }
 }

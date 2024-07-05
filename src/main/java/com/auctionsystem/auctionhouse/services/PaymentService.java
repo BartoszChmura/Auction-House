@@ -53,6 +53,7 @@ public class PaymentService {
 
 
     public OAuthTokenResponse createOAuthToken() {
+        log.info("Tworzenie tokenu OAuth");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -63,17 +64,19 @@ public class PaymentService {
         map.add("client_secret", clientSecret);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
 
         try {
-            return objectMapper.readValue(response.getBody(), OAuthTokenResponse.class);
+            OAuthTokenResponse tokenResponse = objectMapper.readValue(response.getBody(), OAuthTokenResponse.class);
+            log.info("Token OAuth utworzony pomyślnie");
+            return tokenResponse;
         } catch (Exception e) {
             throw new RuntimeException("Nie udało się uzyskać tokenu", e);
         }
     }
 
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest, Long winningBidId) {
+        log.info("Inicjowanie płatności dla wygranej licytacji o id: {}", winningBidId);
         try {
             Optional<Bid> winningBid = bidService.getBidEntityById(winningBidId);
             if (winningBid.isEmpty()) {
@@ -94,7 +97,6 @@ public class PaymentService {
             product.setVirtual(true);
 
             paymentRequest.setProducts(Collections.singletonList(product));
-
             paymentRequest.setContinueUrl(continueUrl);
             paymentRequest.setNotifyUrl(notifyUrl);
             paymentRequest.setCustomerIp("192.168.1.1");
@@ -104,18 +106,14 @@ public class PaymentService {
 
             OAuthTokenResponse tokenResponse = createOAuthToken();
 
-
             RestTemplate restTemplate = new RestTemplate();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(tokenResponse.getAccessToken());
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
             HttpEntity<PaymentRequest> request = new HttpEntity<>(paymentRequest, headers);
-
             ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(paymentsUrl, request, PaymentResponse.class);
-
 
             Payment payment = new Payment();
             payment.setBid(winningBid.get());
@@ -125,27 +123,37 @@ public class PaymentService {
 
             paymentRepository.save(payment);
 
+            log.info("Płatność zainicjowana pomyślnie dla wygranej licytacji o id: {}", winningBidId);
             return response.getBody();
         } catch (Exception e) {
             throw new RuntimeException("Nie udało się zainicjować płatności", e);
         }
     }
-        public void updatePaymentStatus (PaymentNotification notification){
-            Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrder().getOrderId());
-            existingPayment.setPaymentStatus(notification.getOrder().getStatus());
-            if (existingPayment.getPaymentStatus().equals("COMPLETED")) {
-                finishPayment(existingPayment);
-            }
-            paymentRepository.save(existingPayment);
-        }
 
-        public void finishPayment (Payment payment) {
-            Optional<Item> existingItem = itemService.getItemEntityById(payment.getBid().getItem().getId());
-            if (existingItem.isEmpty()) {
-                throw new EntityNotFoundException("Nie znaleziono przedmiotu");
-            }
-            existingItem.get().setStatus("sprzedano");
-            itemService.updateItem(itemMapper.toDto(existingItem.get()));
+    public void updatePaymentStatus(PaymentNotification notification) {
+        log.info("Aktualizacja statusu płatności dla transakcji o id: {}", notification.getOrder().getOrderId());
+        Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrder().getOrderId());
+        if (existingPayment == null) {
+            throw new EntityNotFoundException("Nie znaleziono płatności o id transakcji " + notification.getOrder().getOrderId());
         }
+        existingPayment.setPaymentStatus(notification.getOrder().getStatus());
+        if (existingPayment.getPaymentStatus().equals("COMPLETED")) {
+            finishPayment(existingPayment);
+        }
+        paymentRepository.save(existingPayment);
+        log.info("Status płatności zaktualizowany pomyślnie dla transakcji o id: {}", notification.getOrder().getOrderId());
     }
+
+    public void finishPayment(Payment payment) {
+        log.info("Finalizacja płatności dla przedmiotu o id: {}", payment.getBid().getItem().getId());
+        Optional<Item> existingItem = itemService.getItemEntityById(payment.getBid().getItem().getId());
+        if (existingItem.isEmpty()) {
+            throw new EntityNotFoundException("Nie znaleziono przedmiotu");
+        }
+        existingItem.get().setStatus("sprzedano");
+        itemService.updateItem(itemMapper.toDto(existingItem.get()));
+        log.info("Płatność sfinalizowana pomyślnie dla przedmiotu o id: {}", payment.getBid().getItem().getId());
+    }
+}
+
 
