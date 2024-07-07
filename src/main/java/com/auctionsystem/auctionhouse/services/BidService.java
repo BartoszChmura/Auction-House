@@ -5,7 +5,6 @@ import com.auctionsystem.auctionhouse.dtos.ItemDto;
 import com.auctionsystem.auctionhouse.entities.Bid;
 import com.auctionsystem.auctionhouse.entities.User;
 import com.auctionsystem.auctionhouse.mappers.BidMapper;
-import com.auctionsystem.auctionhouse.mappers.ItemMapper;
 import com.auctionsystem.auctionhouse.repositories.BidRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +26,18 @@ public class BidService {
     private final BidMapper bidMapper;
     private final ItemService itemService;
     private final UserService userService;
-    private final ItemMapper itemMapper;
 
     @Autowired
-    public BidService(BidRepository bidRepository, BidMapper bidMapper, @Lazy ItemService itemService, UserService userService, ItemMapper itemMapper) {
+    public BidService(BidRepository bidRepository, BidMapper bidMapper, @Lazy ItemService itemService, UserService userService) {
         this.bidRepository = bidRepository;
         this.bidMapper = bidMapper;
         this.itemService = itemService;
         this.userService = userService;
-        this.itemMapper = itemMapper;
     }
 
     @Transactional
     public BidDto saveBid(BidDto bidDto) {
-        log.info("Zapisywanie oferty");
+        log.info("Zapisywanie oferty o id {}", bidDto.getId());
         Optional<ItemDto> existingItem = itemService.getItemById(bidDto.getItemId());
         if (existingItem.isEmpty()) {
             throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
@@ -63,7 +60,7 @@ public class BidService {
 
         existingItem.get().setCurrentPrice(bidDto.getBidAmount());
         itemService.updateCurrentPrice(existingItem.get());
-        log.info("Zapisano ofertę");
+        log.info("Zapisano ofertę o id {}", bidDto.getId());
 
         return bidMapper.toDto(savedBid);
 

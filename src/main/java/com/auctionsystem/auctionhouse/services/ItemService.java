@@ -42,7 +42,7 @@ public class ItemService {
 
     @Transactional
     public ItemDto saveItem(ItemDto itemDto) {
-        log.info("Zapisywanie przedmiotu", itemDto);
+        log.info("Zapisywanie przedmiotu o id {}", itemDto.getId());
         if (itemDto.getTitle() == null || itemDto.getTitle().isEmpty() || itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
             throw new IllegalArgumentException("Title and description cannot be null or empty.");
         }
@@ -63,7 +63,7 @@ public class ItemService {
         item.setStatus("aktywna");
 
         Item savedItem = itemRepository.save(item);
-        log.info("Zapisano przedmiot", savedItem);
+        log.info("Zapisano przedmiot o id {}", savedItem.getId());
         return itemMapper.toDto(savedItem);
     }
 

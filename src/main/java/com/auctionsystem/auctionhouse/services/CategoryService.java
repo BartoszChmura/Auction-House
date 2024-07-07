@@ -26,13 +26,13 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto saveCategory(CategoryDto categoryDto) {
-        log.info("Zapisywanie kategorii");
+        log.info("Zapisywanie kategorii o id {}", categoryDto.getId());
         Category category = categoryMapper.toEntity(categoryDto);
         if (getCategoryByCategoryName(category.getCategoryName()).isPresent()) {
             throw new IllegalArgumentException(String.format("Kategoria %s już istnieje", category.getCategoryName()));
         }
         Category savedCategory = categoryRepository.save(category);
-        log.info("Zapisano kategorie");
+        log.info("Zapisano kategorię o id {}", savedCategory.getId());
         return categoryMapper.toDto(savedCategory);
     }
 

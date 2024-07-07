@@ -5,7 +5,6 @@ import com.auctionsystem.auctionhouse.entities.Bid;
 import com.auctionsystem.auctionhouse.entities.Item;
 import com.auctionsystem.auctionhouse.entities.Payment;
 import com.auctionsystem.auctionhouse.mappers.ItemMapper;
-import com.auctionsystem.auctionhouse.mappers.PaymentMapper;
 import com.auctionsystem.auctionhouse.repositories.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,15 +30,13 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BidService bidService;
     private final ItemService itemService;
-    private final PaymentMapper paymentMapper;
     private final ItemMapper itemMapper;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, BidService bidService, ItemService itemService, PaymentMapper paymentMapper, ItemMapper itemMapper) {
+    public PaymentService(PaymentRepository paymentRepository, BidService bidService, ItemService itemService, ItemMapper itemMapper) {
         this.paymentRepository = paymentRepository;
         this.bidService = bidService;
         this.itemService = itemService;
-        this.paymentMapper = paymentMapper;
         this.itemMapper = itemMapper;
     }
 

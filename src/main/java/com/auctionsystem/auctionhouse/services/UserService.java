@@ -32,7 +32,7 @@ public class UserService {
 
     @Transactional
     public UserDto saveUser(UserDto userDto) {
-        log.info("Zapisywanie użytkownika");
+        log.info("Zapisywanie użytkownika o id {}", userDto.getId());
         if (userDto.getUsername() == null || userDto.getPassword() == null) {
             throw new IllegalArgumentException("Nazwa użytkownika i hasło są wymagane");
         }
@@ -44,7 +44,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         user.setPasswordHash(encodedPassword);
         User savedUser = userRepository.save(user);
-        log.info("Zapisano użytkownika");
+        log.info("Zapisano użytkownika o id: {}", savedUser.getId());
         return userMapper.toDto(savedUser);
     }
 
