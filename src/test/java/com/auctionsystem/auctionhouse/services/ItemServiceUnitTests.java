@@ -23,7 +23,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ItemServiceTest {
+public class ItemServiceUnitTests {
 
     @Mock
     private ItemRepository itemRepository;

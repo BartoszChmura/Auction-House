@@ -127,6 +127,7 @@ public class UserService {
         log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji użytkownika o id: {}", id);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
+        log.info("Nazwa aktualnego użytkownika: {}", currentPrincipalName);
 
         Optional<UserDto> existingUserDto = getUserById(id);
         boolean isAuthorized = existingUserDto.isPresent() && existingUserDto.get().getUsername().equals(currentPrincipalName);

@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class UserServiceTest {
+public class UserServiceUnitTests {
     @Mock
     private UserRepository userRepository;
 
@@ -41,7 +40,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testSaveUser() {
+    public void testSaveUser_Success() {
         // Given
         UserDto userDto = createUserDto(1L);
 
@@ -59,6 +58,42 @@ public class UserServiceTest {
         assertEquals("testuser", result.getUsername());
         verify(userRepository, times(1)).findByUsername(userDto.getUsername());
         verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    public void testSaveUser_noPasswordOrUsername() {
+        UserDto userDto = createUserDto(1L);
+        userDto.setUsername(null);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.saveUser(userDto);
+        });
+
+        assertEquals("Nazwa użytkownika i hasło są wymagane", exception.getMessage());
+
+        userDto.setUsername("testuser");
+        userDto.setPassword(null);
+
+        exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.saveUser(userDto);
+        });
+
+        assertEquals("Nazwa użytkownika i hasło są wymagane", exception.getMessage());
+    }
+
+    @Test
+    public void testSaveUser_userAlreadyExists() {
+        UserDto userDto = createUserDto(1L);
+
+        User existingUser = createUser(2L);
+
+        when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Optional.of(existingUser));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.saveUser(userDto);
+        });
+
+        assertEquals("Użytkownik o takiej nazwie już istnieje", exception.getMessage());
     }
 
     @Test

@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class BidServiceTest {
+public class BidServiceUnitTests {
 
     @Mock
     BidMapper bidMapper;
