@@ -17,14 +17,13 @@ public class ItemController {
     private final ItemService itemService;
 
 
-
     @Autowired
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addItem(@RequestBody ItemDto itemDto) {
+    @PostMapping("/save")
+    public ResponseEntity<?> saveItem(@RequestBody ItemDto itemDto) {
             ItemDto savedItem = itemService.saveItem(itemDto);
             return ResponseEntity.ok(savedItem);
     }
@@ -47,6 +46,10 @@ public class ItemController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) {
+        Optional<ItemDto> existingItem = itemService.getItemById(id);
+        if (existingItem.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+        }
         if (!itemService.isUserAuthorizedToUpdateItem(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji czyjegoś przedmiotu");
         }

@@ -59,6 +59,10 @@ public class UserController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        Optional<UserDto> existingUser = userService.getUserById(id);
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+        }
         if (!userService.isUserAuthorizedToUpdate(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji danych innego użytkownika");
         }

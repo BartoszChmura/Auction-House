@@ -5,27 +5,17 @@ import com.auctionsystem.auctionhouse.entities.User;
 import com.auctionsystem.auctionhouse.repositories.UserRepository;
 import com.auctionsystem.auctionhouse.services.JwtService;
 import com.auctionsystem.auctionhouse.services.JwtUserDetailsService;
-import com.auctionsystem.auctionhouse.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,9 +23,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -71,26 +60,21 @@ public class UserControllerIntegrationTests {
         userRepository.save(createUser(2L, "testuser2"));
         userRepository.save(createUser(3L, "testuser3"));
 
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            System.out.println("User ID: " + user.getId());
-            System.out.println("Username: " + user.getUsername());
-            System.out.println("Email: " + user.getEmail());
-            System.out.println("-------------------------");
-        }
-
+        // Granting authentication to testuser1
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername("testuser1");
         jwtToken = jwtService.generateToken(userDetails);
     }
 
     @Test
     public void testRegisterUser_OK() throws Exception {
-        UserDto userDto = createUserDto(10L, "testuser10");
+        UserDto userDto = createUserDto(4L, "testuser4");
 
         mockMvc.perform(post("/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(4))
+                .andExpect(jsonPath("$.username").value("testuser4"));
     }
 
     @Test
@@ -115,7 +99,10 @@ public class UserControllerIntegrationTests {
         mockMvc.perform(get("/user/" + userId)
                         .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("testuser1"))
+                .andExpect(jsonPath("$.email").value("testuser@mail.com"));
     }
 
     @Test
@@ -147,7 +134,67 @@ public class UserControllerIntegrationTests {
                         .header("Authorization", "Bearer " + jwtToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("testuser1"))
+                .andExpect(jsonPath("$.email").value("test@mail.com"));
+    }
+
+    @Test
+    public void updateUser_NotFound() throws Exception {
+        UserDto userDto = createUserDto(2L, "testuser2");
+        userDto.setEmail("test@mail.com");
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/{id}", 15L)
+
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateUser_Unauthorized() throws Exception {
+        UserDto userDto = createUserDto(2L, "testuser2");
+        userDto.setEmail("test@mail.com");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/{id}", 2L)
+
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void deleteUser_OK() throws Exception {
+        Long userId = 1L;
+
+        mockMvc.perform(delete("/user/" + userId)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteUser_NotAuthenticated() throws Exception {
+        Long userId = 2L;
+
+        mockMvc.perform(delete("/user/" + userId)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(401));
+    }
+
+    @Test
+    public void deleteUser_NotFound() throws Exception {
+        Long userId = 15L;
+
+        mockMvc.perform(delete("/user/" + userId)
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
 

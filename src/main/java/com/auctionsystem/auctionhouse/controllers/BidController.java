@@ -2,6 +2,7 @@ package com.auctionsystem.auctionhouse.controllers;
 
 import com.auctionsystem.auctionhouse.dtos.BidDto;
 import com.auctionsystem.auctionhouse.services.BidService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/bid")
+@Slf4j
 public class BidController {
 
     private final BidService bidService;
@@ -23,6 +25,7 @@ public class BidController {
 
     @PostMapping
     public ResponseEntity<?> addBid(@RequestBody BidDto bidDto) {
+        log.info("Received BidDto:" + bidDto.getBidAmount() + " " + bidDto.getItemId() + " " + bidDto.getBidderId() + " " + bidDto.getId());
         BidDto savedBid = bidService.saveBid(bidDto);
         return ResponseEntity.ok(savedBid);
     }
