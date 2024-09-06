@@ -11,19 +11,19 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana gł
 
 ## Wykorzystane Technologie
 
-###Główny Stack Technologiczny
+### Główny Stack Technologiczny
 - **Java**
 - **Spring/Spring Boot**
 - **Hibernate**
 - **PostgreSQL**
 
-###Narzędzia do testowania
+### Narzędzia do testowania
 - **JUnit**
 - **Mockito**
 - **H2 Database**
 - **Spring Boot Test***
 
-###Narzędzia pomocnicze
+### Narzędzia pomocnicze
 - **Maven**
 - **Git**
 - **JWT**
