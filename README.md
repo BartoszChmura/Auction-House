@@ -67,7 +67,7 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana gł
 
 ### Auction House Interface
 
-Prosty interfejs prezentujący działanie aplikacji w warunkach lokalnych: https://github.com/BartoszChmura/Auction-House-Interface (link do repozytorium).
+Prosty interfejs w postaci strony internetowej, prezentujący działanie aplikacji, do uruchomienia lokalnie: https://github.com/BartoszChmura/Auction-House-Interface (link do repozytorium).
 
 ### System płatności
 
