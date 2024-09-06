@@ -32,10 +32,10 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana gł
 ## Pierwsze Kroki
 
 ### Wymagania
-- Java 17+
-- Maven
-- PostgreSQL
-- Git
+- **Java 17+**
+- **Maven**
+- **PostgreSQL**
+- **Git**
 
 ### Instalacja
 
