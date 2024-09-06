@@ -65,6 +65,10 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana gł
 4. **Dostęp do API:**
     Serwis domyślnie będzie dostępny na porcie 8080.
 
+### Auction House Interface
+
+Prosty interfejs prezentujący działanie aplikacji w warunkach lokalnych: https://github.com/BartoszChmura/Auction-House-Interface (link do repozytorium).
+
 ### System płatności
 
 ---Do poprawnego działania zewnętrznego systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
