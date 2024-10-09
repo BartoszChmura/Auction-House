@@ -70,6 +70,7 @@ To run this project, ensure that you have the following software installed:
 4. **Access the API:**
     The application will be available by default at `http://localhost:8080`.
 
+
 ### Auction House Frontend
 
 A simple web interface that demonstrates the functionality of the application is available here: [Auction House Interface](https://github.com/BartoszChmura/Auction-House-Interface). Follow the instructions in that repository to run the frontend locally.
@@ -78,9 +79,15 @@ A simple web interface that demonstrates the functionality of the application is
 
 For integrating external payment systems, a tool like **Ngrok** is required to expose your local application to the internet for testing payment callbacks and other external interactions. Ngrok creates a secure tunnel from a public URL to your local machine, allowing external systems to communicate with your local environment.
 
-## Development and Testing
+### Testing
 
 To run the tests, use the following command:
 ```bash
 mvn test
+```
 
+## API Documentation
+
+The API documentation and available endpoints can be accessed locally after running the application at the following URL:
+
+[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
