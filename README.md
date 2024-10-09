@@ -1,74 +1,86 @@
 # Auction House
 
-## Opis
-Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana głównie za pomocą frameworku Spring Boot, która umożliwia użytkownikom tworzenie, zarządzanie i licytowanie aukcji. Aplikacja oferuje pełne wsparcie dla zarządzania kontami użytkowników, mechanizmy licytacji, integrację z systemami płatności oraz zaawansowane funkcje zabezpieczeń. Repozytorium dotyczy części backendowej aplikacji.
+## Description
+Auction House is a web-based auction platform developed using the Java Spring Boot framework. The application allows users to create, manage, and participate in auctions. It provides robust features such as user account management, real-time bidding, integration with payment gateways, and advanced security mechanisms. This repository contains the backend code of the application.
 
-## Funkcje
-- Rejestracja i uwierzytelnianie użytkowników za pomocą tokena JWT
-- Tworzenie i zarządzanie aukcjami
-- System licytacji
-- Integracja z zewnętrznym systemem płatności
+## Features
+- User registration and authentication via JWT tokens
+- Creation and management of auctions
+- Real-time bidding system
+- Integration with external payment services
+- Secure user sessions and data handling
 
-## Wykorzystane Technologie
+## Technologies Used
 
-### Główny Stack Technologiczny
+### Core Technologies
 - **Java**
 - **Spring/Spring Boot**
 - **Hibernate**
 - **PostgreSQL**
 
-### Narzędzia do testowania
+### Testing Tools
 - **JUnit**
 - **Mockito**
 - **H2 Database**
-- **Spring Boot Test***
+- **Spring Boot Test**
 
-### Narzędzia pomocnicze
+### Additional Tools
 - **Maven**
 - **Git**
-- **JWT**
+- **JWT (JSON Web Tokens)**
 - **Ngrok**
 
-## Pierwsze Kroki
+## Getting Started
 
-### Wymagania
+### Prerequisites
+To run this project, ensure that you have the following software installed:
 - **Java 17+**
 - **Maven**
 - **PostgreSQL**
 - **Git**
 
-### Instalacja
+### Installation
 
-1. **Sklonuj repozytorium:**
+1. **Clone the repository:**
     ```bash
     git clone https://github.com/BartoszChmura/auction-house.git
-    cd auction-house
     ```
 
-2. **Skonfiguruj bazę danych PostgreSQL:**
-    - Utwórz bazę danych o nazwie `AuctionHouse`.
-    - Skonfiguruj plik `application.properties` z danymi dostępowymi do bazy danych.
+2. **Configure the PostgreSQL database:**
+    - Create a PostgreSQL database named `AuctionHouse`.
+    - Edit the `application.properties` file to include your database credentials:
     ```properties
     spring.datasource.url=jdbc:postgresql://localhost:5432/AuctionHouse
     spring.datasource.username=postgres
-    spring.datasource.password=123
+    spring.datasource.password=your_password
     spring.jpa.show-sql=true
     spring.jpa.hibernate.ddl-auto=update
     ```
 
-3. **Zbuduj i uruchom aplikację:**
-    ```bash
-    mvn clean install
-    mvn spring-boot:run
-    ```
+3. **Build and run the application:**
+    - Compile and package the application:
+      ```bash
+      mvn clean install
+      ```
+    - Start the application using Spring Boot:
+      ```bash
+      mvn spring-boot:run
+      ```
 
-4. **Dostęp do API:**
-    Serwis domyślnie będzie dostępny na porcie 8080.
+4. **Access the API:**
+    The application will be available by default at `http://localhost:8080`.
 
-### Auction House Interface
+### Auction House Frontend
 
-Prosty interfejs w postaci strony internetowej, prezentujący działanie aplikacji, do uruchomienia lokalnie: https://github.com/BartoszChmura/Auction-House-Interface (link do repozytorium).
+A simple web interface that demonstrates the functionality of the application is available here: [Auction House Interface](https://github.com/BartoszChmura/Auction-House-Interface). Follow the instructions in that repository to run the frontend locally.
 
-### System płatności
+### Payment System Integration
 
----Do poprawnego działania zewnętrznego systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
+For integrating external payment systems, a tool like **Ngrok** is required to expose your local application to the internet for testing payment callbacks and other external interactions. Ngrok creates a secure tunnel from a public URL to your local machine, allowing external systems to communicate with your local environment.
+
+## Development and Testing
+
+To run the tests, use the following command:
+```bash
+mvn test
+
