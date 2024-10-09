@@ -72,4 +72,3 @@ Prosty interfejs w postaci strony internetowej, prezentujący działanie aplikac
 ### System płatności
 
 ---Do poprawnego działania zewnętrznego systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
-
