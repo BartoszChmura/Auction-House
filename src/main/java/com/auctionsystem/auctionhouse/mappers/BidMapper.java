@@ -16,6 +16,7 @@ public class BidMapper {
         bidDto.setBidderId(bid.getBidder().getId());
         bidDto.setBidAmount(bid.getBidAmount());
         bidDto.setBidTime(bid.getBidTime());
+
         return bidDto;
     }
 
@@ -30,6 +31,7 @@ public class BidMapper {
         bid.setBidder(bidder);
         bid.setBidAmount(bidDto.getBidAmount());
         bid.setBidTime(bidDto.getBidTime());
+
         return bid;
     }
 }

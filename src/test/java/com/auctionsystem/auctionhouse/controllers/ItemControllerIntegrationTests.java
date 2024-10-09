@@ -214,8 +214,8 @@ public class ItemControllerIntegrationTests {
         item.setDescription(description);
         item.setStartPrice(100.0);
         item.setEndTime(LocalDateTime.now().plusDays(1));
-        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie kategori użytkownika o id 1")));
-        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id " + sellerId)));
+        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("No category with id 1 found")));
+        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("No user with id " + sellerId + " found")));
         return item;
     }
 

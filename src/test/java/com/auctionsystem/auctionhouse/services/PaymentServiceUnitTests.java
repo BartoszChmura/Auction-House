@@ -52,7 +52,7 @@ public class PaymentServiceUnitTests {
         payment.setBid(bid);
 
         ItemDto itemDto = new ItemDto();
-        itemDto.setStatus("sprzedano");
+        itemDto.setStatus("sold");
 
         given(itemService.getItemEntityById(anyLong())).willReturn(Optional.of(item));
         given(itemMapper.toDto(any(Item.class))).willReturn(itemDto);
@@ -64,10 +64,9 @@ public class PaymentServiceUnitTests {
         ArgumentCaptor<ItemDto> itemDtoCaptor = ArgumentCaptor.forClass(ItemDto.class);
         verify(itemService, times(1)).updateItem(itemDtoCaptor.capture());
         ItemDto updatedItemDto = itemDtoCaptor.getValue();
-        assertEquals("sprzedano", updatedItemDto.getStatus());
+        assertEquals("sold", updatedItemDto.getStatus());
         verify(itemMapper).toDto(any(Item.class));
     }
-
 
 
     public Payment createPayment() {
@@ -78,6 +77,4 @@ public class PaymentServiceUnitTests {
         payment.setTransactionId("123456");
         return payment;
     }
-
-
 }

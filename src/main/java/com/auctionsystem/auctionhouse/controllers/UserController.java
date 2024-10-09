@@ -17,12 +17,12 @@ public class UserController {
     private final UserService userService;
 
 
-
     @Autowired
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
         try {
@@ -39,7 +39,7 @@ public class UserController {
         if (userDto.isPresent()) {
             return ResponseEntity.ok(userDto.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " does not exist");
         }
     }
 
@@ -49,39 +49,42 @@ public class UserController {
         if (userDto.isPresent()) {
             return ResponseEntity.ok(userDto.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o nazwie " + username + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with username " + username + " does not exist");
         }
     }
+
     @GetMapping("/all")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         Optional<UserDto> existingUser = userService.getUserById(id);
         if (existingUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " does not exist");
         }
         if (!userService.isUserAuthorizedToUpdate(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji danych innego użytkownika");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update someone else's data");
         }
 
         userDto.setId(id);
         UserDto updatedUserDto = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         Optional<UserDto> existingUser = userService.getUserById(id);
         if (existingUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " does not exist");
         }
         if (!userService.isUserAuthorizedToUpdate(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia innego użytkownika");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete someone else's data");
         }
 
         userService.deleteUser(id);
-        return ResponseEntity.ok("Użytkownik o id " + id + " został usunięty");
+        return ResponseEntity.ok("User with id " + id + " has been deleted");
     }
 }

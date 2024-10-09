@@ -78,6 +78,5 @@ public class PaymentRequest {
 
         @JsonProperty("lastName")
         private String lastName;
-
     }
 }

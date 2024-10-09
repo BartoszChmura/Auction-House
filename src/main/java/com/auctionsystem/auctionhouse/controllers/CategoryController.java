@@ -44,7 +44,7 @@ public class CategoryController {
         if (categoryDto.isPresent()) {
             return ResponseEntity.ok(categoryDto.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item with id " + id + " does not exist");
         }
     }
 
@@ -52,7 +52,7 @@ public class CategoryController {
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
         Optional<CategoryDto> existingCategory = categoryService.getCategoryById(id);
         if (existingCategory.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategoria o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with id " + id + " does not exist");
         }
         categoryDto.setId(id);
         CategoryDto updatedCategory = categoryService.updateCategory(categoryDto);
@@ -63,10 +63,10 @@ public class CategoryController {
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         Optional<CategoryDto> existingCategory = categoryService.getCategoryById(id);
         if (existingCategory.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategoria o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with id " + id + " does not exist");
         }
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok("Kategoria o id " + id + " została usunięta");
+        return ResponseEntity.ok("Category with id " + id + " has been deleted");
     }
 
 }

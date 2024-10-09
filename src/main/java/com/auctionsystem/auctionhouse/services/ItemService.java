@@ -42,12 +42,12 @@ public class ItemService {
 
     @Transactional
     public ItemDto saveItem(ItemDto itemDto) {
-        log.info("Zapisywanie przedmiotu o id {}", itemDto.getId());
+        log.info("Saving item with id {}", itemDto.getId());
         if (itemDto.getTitle() == null || itemDto.getTitle().isEmpty() || itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Title and description cannot be null or empty.");
+            throw new IllegalArgumentException("Title and description cannot be null or empty");
         }
         if (itemDto.getEndTime() == null || itemDto.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("End time must be in the future.");
+            throw new IllegalArgumentException("End time must be in the future");
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,54 +60,59 @@ public class ItemService {
         item.setWinner(null);
         item.setCategory(category);
         item.setCurrentPrice(itemDto.getStartPrice());
-        item.setStatus("aktywna");
+        item.setStatus("active");
 
         Item savedItem = itemRepository.save(item);
-        log.info("Zapisano przedmiot o id {}", savedItem.getId());
+        log.info("Saved item with id {}", savedItem.getId());
+
         return itemMapper.toDto(savedItem);
     }
 
     @Transactional
     public List<ItemDto> getAllItems() {
-        log.info("Pobieranie wszystkich przedmiotów");
+        log.info("Retrieving all items");
         List<Item> items = itemRepository.findAll();
         List<ItemDto> result = items.stream()
                 .map(itemMapper::toDto)
                 .collect(Collectors.toList());
-        log.info("Pobrano wszystkie przedmioty");
+        log.info("Retrieved all items");
+
         return result;
     }
 
     @Transactional
     public List<Item> getAllItemsEntity() {
-        log.info("Pobieranie wszystkich encji przedmiotów");
+        log.info("Retrieving all item entities");
         List<Item> result = itemRepository.findAll();
-        log.info("Pobrano wszystkie encje przedmiotów");
+        log.info("Retrieved all item entities");
+
         return result;
     }
 
     @Transactional
     public Optional<ItemDto> getItemById(Long id) {
-        log.info("Pobieranie przedmiotu o id: {}", id);
+        log.info("Retrieving item with id: {}", id);
         Optional<ItemDto> result = itemRepository.findById(id)
                 .map(itemMapper::toDto);
-        log.info("Pobrano przedmiot o id: {}", id);
+        log.info("Retrieved item with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public Optional<Item> getItemEntityById(Long id) {
-        log.info("Pobieranie encji przedmiotu o id: {}", id);
+        log.info("Retrieving item entity with id: {}", id);
         Optional<Item> result = itemRepository.findById(id);
-        log.info("Pobrano encję przedmiotu o id: {}", id);
+        log.info("Retrieved item entity with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public ItemDto updateItem(ItemDto itemDto) {
-        log.info("Aktualizacja przedmiotu: {}", itemDto);
+        log.info("Updating item: {}", itemDto);
         Item existingItem = itemRepository.findById(itemDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono przedmiotu z takim ID"));
+                .orElseThrow(() -> new IllegalArgumentException("Item with such ID not found"));
 
         if (itemDto.getTitle() != null && !itemDto.getTitle().isEmpty()) {
             existingItem.setTitle(itemDto.getTitle());
@@ -122,61 +127,63 @@ public class ItemService {
         }
 
         Item updatedItem = itemRepository.save(existingItem);
-        log.info("Przedmiot zaktualizowany pomyślnie: {}", updatedItem);
+        log.info("Item updated successfully: {}", updatedItem);
+
         return itemMapper.toDto(updatedItem);
     }
 
     @Transactional
     public void deleteItem(Long id) {
-        log.info("Usuwanie przedmiotu o id: {}", id);
+        log.info("Deleting item with id: {}", id);
         itemRepository.deleteById(id);
-        log.info("Przedmiot o id {} został pomyślnie usunięty", id);
+        log.info("Item with id {} has been successfully deleted", id);
     }
 
     public boolean isUserAuthorizedToUpdateItem(Long id) {
-        log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji przedmiotu o id: {}", id);
+        log.info("Checking if user is authorized to update item with id: {}", id);
         Optional<ItemDto> itemDto = getItemById(id);
         if (itemDto.isEmpty()) {
-            throw new IllegalArgumentException("Nie znaleziono przedmiotu o id " + id);
+            throw new IllegalArgumentException("Item with id " + id + " does not exist");
         }
 
         Long sellerId = itemDto.get().getSellerId();
         boolean isAuthorized = userService.isUserAuthorizedToUpdate(sellerId);
-        log.info("Użytkownik {} jest {} do aktualizacji przedmiotu o id: {}", sellerId, isAuthorized ? "upoważniony" : "nieupoważniony", id);
+        log.info("User {} is {} to update item with id: {}", sellerId, isAuthorized ? "authorized" : "not authorized", id);
+
         return isAuthorized;
     }
 
     @Transactional
     public ItemDto updateCurrentPrice(ItemDto itemDto) {
-        log.info("Aktualizacja bieżącej ceny przedmiotu: {}", itemDto);
+        log.info("Updating current price of item: {}", itemDto);
         Item existingItem = itemRepository.findById(itemDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono przedmiotu z takim ID"));
+                .orElseThrow(() -> new IllegalArgumentException("Item with such ID not found"));
 
         if (itemDto.getCurrentPrice() != null && itemDto.getCurrentPrice() > existingItem.getCurrentPrice()) {
             existingItem.setCurrentPrice(itemDto.getCurrentPrice());
         }
 
         Item updatedItem = itemRepository.save(existingItem);
-        log.info("Bieżąca cena przedmiotu zaktualizowana pomyślnie: {}", updatedItem);
+        log.info("Current price of item updated successfully: {}", updatedItem);
+
         return itemMapper.toDto(updatedItem);
     }
 
     @Transactional
     public void endAuction(Long id) {
-        log.info("Zakończenie aukcji dla przedmiotu o id: {}", id);
-        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Przedmiot o id " + id + " nie istnieje"));
-        if (!item.getStatus().equals("aktywna")) {
-            throw new IllegalArgumentException("Aukcja jest już zakończona");
+        log.info("Ending auction for item with id: {}", id);
+        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Item with id " + id + " does not exist"));
+        if (!item.getStatus().equals("active")) {
+            throw new IllegalArgumentException("Auction is already finished");
         }
         Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(id);
         if (winnerBid.isEmpty()) {
-            item.setStatus("nie sprzedano");
+            item.setStatus("not sold");
         } else {
-            item.setWinner(userService.getUserEntityById(winnerBid.get().getBidderId()).orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje")));
-            item.setStatus("oczekuje na płatność");
+            item.setWinner(userService.getUserEntityById(winnerBid.get().getBidderId()).orElseThrow(() -> new IllegalArgumentException("User does not exist")));
+            item.setStatus("awaiting payment");
         }
         itemRepository.save(item);
-        log.info("Aukcja dla przedmiotu o id {} została zakończona", id);
+        log.info("Auction for item with id {} has been ended", id);
     }
-
 }

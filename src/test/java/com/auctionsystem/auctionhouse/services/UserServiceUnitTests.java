@@ -69,7 +69,7 @@ public class UserServiceUnitTests {
             userService.saveUser(userDto);
         });
 
-        assertEquals("Nazwa użytkownika i hasło są wymagane", exception.getMessage());
+        assertEquals("Username and password are required", exception.getMessage());
 
         userDto.setUsername("testuser");
         userDto.setPassword(null);
@@ -78,7 +78,7 @@ public class UserServiceUnitTests {
             userService.saveUser(userDto);
         });
 
-        assertEquals("Nazwa użytkownika i hasło są wymagane", exception.getMessage());
+        assertEquals("Username and password are required", exception.getMessage());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class UserServiceUnitTests {
             userService.saveUser(userDto);
         });
 
-        assertEquals("Użytkownik o takiej nazwie już istnieje", exception.getMessage());
+        assertEquals("User with such username already exists", exception.getMessage());
     }
 
     @Test

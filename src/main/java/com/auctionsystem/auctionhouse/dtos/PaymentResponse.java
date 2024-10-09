@@ -25,4 +25,3 @@ public class PaymentResponse {
     @JsonProperty("error")
     private String error;
 }
-

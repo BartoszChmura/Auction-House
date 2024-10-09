@@ -26,6 +26,7 @@ public class ItemMapper {
         itemDto.setCreatedAt(item.getCreatedAt());
         itemDto.setUpdatedAt(item.getUpdatedAt());
         itemDto.setStatus(item.getStatus());
+
         return itemDto;
     }
 
@@ -52,6 +53,7 @@ public class ItemMapper {
         item.setCreatedAt(itemDto.getCreatedAt());
         item.setUpdatedAt(itemDto.getUpdatedAt());
         item.setStatus(itemDto.getStatus());
+
         return item;
     }
 }

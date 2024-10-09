@@ -16,7 +16,6 @@ public class ItemController {
 
     private final ItemService itemService;
 
-
     @Autowired
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
@@ -24,8 +23,8 @@ public class ItemController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveItem(@RequestBody ItemDto itemDto) {
-            ItemDto savedItem = itemService.saveItem(itemDto);
-            return ResponseEntity.ok(savedItem);
+        ItemDto savedItem = itemService.saveItem(itemDto);
+        return ResponseEntity.ok(savedItem);
     }
 
     @GetMapping("/all")
@@ -40,7 +39,7 @@ public class ItemController {
         if (itemDto.isPresent()) {
             return ResponseEntity.ok(itemDto.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item with id " + id + " does not exist");
         }
     }
 
@@ -48,10 +47,10 @@ public class ItemController {
     public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) {
         Optional<ItemDto> existingItem = itemService.getItemById(id);
         if (existingItem.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item with id " + id + " does not exist");
         }
         if (!itemService.isUserAuthorizedToUpdateItem(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do aktualizacji czyjegoś przedmiotu");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update someone else's item");
         }
         itemDto.setId(id);
         ItemDto updatedItem = itemService.updateItem(itemDto);
@@ -62,13 +61,12 @@ public class ItemController {
     public ResponseEntity<?> deleteItem(@PathVariable Long id) {
         Optional<ItemDto> existingItem = itemService.getItemById(id);
         if (existingItem.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Przedmiot o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item with id " + id + " does not exist");
         }
         if (!itemService.isUserAuthorizedToUpdateItem(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia czyjegoś przedmiotu");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete someone else's item");
         }
         itemService.deleteItem(id);
-        return ResponseEntity.ok("Przedmiot o id " + id + " został usunięty");
+        return ResponseEntity.ok("Item with id " + id + " has been deleted");
     }
-
 }

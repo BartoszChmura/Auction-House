@@ -14,7 +14,7 @@ public class OpenAPIConfig {
         return new OpenAPI()
                 .info(new Info().title("Auction House API")
                         .description("This is the REST API for Auction House")
-                        .version("v0.0.1")
+                        .version("v1.0.0")
                         .license(new License().name("Apache 2.0")));
     }
 }

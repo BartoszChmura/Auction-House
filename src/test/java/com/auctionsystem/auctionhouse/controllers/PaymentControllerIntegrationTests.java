@@ -68,7 +68,7 @@ public class PaymentControllerIntegrationTests {
         userRepository.save(createUser(1L, "testuser1"));
         userRepository.save(createUser(2L, "testuser2"));
 
-        categoryRepository.save(createCategory(1L, "Elektronika"));
+        categoryRepository.save(createCategory(1L, "Electronics"));
 
         itemRepository.save(createItem(1L, "testItem", "test", 2L));
 
@@ -116,24 +116,24 @@ public class PaymentControllerIntegrationTests {
         Bid bid = new Bid();
         bid.setId(id);
         bid.setBidAmount(bidAmount);
-        bid.setItem(itemRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono przedmiotu o id 1 1")));
-        bid.setBidder(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id 1")));
+        bid.setItem(itemRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Item with id 1 does not exist")));
+        bid.setBidder(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("User with id 1 does not exist")));
         return bid;
     }
 
-    public PaymentRequest createPaymentRequest(){
+    public PaymentRequest createPaymentRequest() {
         PaymentRequest paymentRequest = new PaymentRequest();
 
         paymentRequest.setContinueUrl("http://example.com/continue");
         paymentRequest.setNotifyUrl("http://example.com/notify");
         paymentRequest.setCustomerIp("192.168.1.1");
         paymentRequest.setMerchantPosId("123456");
-        paymentRequest.setDescription("Płatność");
+        paymentRequest.setDescription("Payment");
         paymentRequest.setCurrencyCode("USD");
         paymentRequest.setTotalAmount("100.00");
 
         PaymentRequest.Product product = new PaymentRequest.Product();
-        product.setName("Przedmiot");
+        product.setName("Item");
         product.setUnitPrice(100);
         product.setQuantity(1);
         product.setVirtual(false);
@@ -173,10 +173,10 @@ public class PaymentControllerIntegrationTests {
         item.setStartPrice(100.0);
         item.setCurrentPrice(100.0);
         item.setEndTime(LocalDateTime.now().plusDays(1));
-        item.setStatus("oczekuje na płatność");
-        item.setWinner(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id 1")));
-        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono kategori o id 1")));
-        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id 1 " + sellerId)));
+        item.setStatus("awaiting payment");
+        item.setWinner(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("User with id 1 does not exist")));
+        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Category with id 1 does not exist")));
+        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("User with id " + sellerId + " does not exist")));
         return item;
     }
 
@@ -192,7 +192,7 @@ public class PaymentControllerIntegrationTests {
     public Payment createPayment(Long id) {
         Payment payment = new Payment();
         payment.setId(id);
-        payment.setBid(bidRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono oferty o id 1")));
+        payment.setBid(bidRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Bid with id 1 does not exist")));
         payment.setAmount(200.0);
         payment.setPaymentStatus("CREATED");
         payment.setTransactionId("1");

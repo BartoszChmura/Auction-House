@@ -21,63 +21,71 @@ public class JwtService {
     private String secret;
 
     public String extractUsername(String token) {
-        log.info("Ekstrakcja nazwy użytkownika z tokenu");
+        log.info("Extracting username from token");
         String username = extractClaim(token, Claims::getSubject);
-        log.info("Nazwa użytkownika z tokenu: {}", username);
+        log.info("Username from token: {}", username);
+
         return username;
     }
 
     public Date extractExpiration(String token) {
-        log.info("Ekstrakcja daty wygaśnięcia z tokenu");
+        log.info("Extracting expiration date from token");
         Date expiration = extractClaim(token, Claims::getExpiration);
-        log.info("Data wygaśnięcia z tokenu: {}", expiration);
+        log.info("Expiration date from token: {}", expiration);
+
         return expiration;
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        log.info("Ekstrakcja roszczenia z tokenu");
+        log.info("Extracting claim from token");
         Claims claims = extractAllClaims(token);
         T claim = claimsResolver.apply(claims);
-        log.info("Roszczenie z tokenu wyekstrahowane");
+        log.info("Claim from token extracted");
+
         return claim;
     }
 
     private Claims extractAllClaims(String token) {
-        log.info("Ekstrakcja wszystkich roszczeń z tokenu");
+        log.info("Extracting all claims from token");
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-        log.info("Wszystkie roszczenia z tokenu wyekstrahowane");
+        log.info("All claims from token extracted");
+
         return claims;
     }
 
     private Boolean isTokenExpired(String token) {
-        log.info("Sprawdzanie, czy token wygasł");
+        log.info("Checking if token is expired");
         Boolean isExpired = extractExpiration(token).before(new Date());
-        log.info("Token wygasł: {}", isExpired);
+        log.info("Token is expired: {}", isExpired);
+
         return isExpired;
     }
 
     public String generateToken(UserDetails userDetails) {
-        log.info("Generowanie tokenu dla użytkownika: {}", userDetails.getUsername());
+        log.info("Generating token for user: {}", userDetails.getUsername());
         Map<String, Object> claims = new HashMap<>();
         String token = createToken(claims, userDetails.getUsername());
-        log.info("Token wygenerowany pomyślnie");
+        log.info("Token generated successfully");
+
         return token;
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        log.info("Tworzenie tokenu dla podmiotu: {}", subject);
+        log.info("Creating token for subject: {}", subject);
         String token = Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
-        log.info("Token stworzony pomyślnie");
+        log.info("Token created successfully");
+
         return token;
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        log.info("Walidacja tokenu dla użytkownika: {}", userDetails.getUsername());
+        log.info("Validating token for user: {}", userDetails.getUsername());
         final String username = extractUsername(token);
         Boolean isValid = (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        log.info("Token jest {}dla użytkownika: {}", isValid ? "ważny " : "nieważny ", userDetails.getUsername());
+        log.info("Token is {} for user: {}", isValid ? "valid " : "invalid ", userDetails.getUsername());
+
         return isValid;
     }
 }

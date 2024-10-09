@@ -32,72 +32,78 @@ public class UserService {
 
     @Transactional
     public UserDto saveUser(UserDto userDto) {
-        log.info("Zapisywanie użytkownika o id {}", userDto.getId());
+        log.info("Saving user with id {}", userDto.getId());
         if (userDto.getUsername() == null || userDto.getPassword() == null) {
-            throw new IllegalArgumentException("Nazwa użytkownika i hasło są wymagane");
+            throw new IllegalArgumentException("Username and password are required");
         }
         Optional<User> existingUser = userRepository.findByUsername(userDto.getUsername());
         if (existingUser.isPresent()) {
-            throw new IllegalArgumentException("Użytkownik o takiej nazwie już istnieje");
+            throw new IllegalArgumentException("User with such username already exists");
         }
         User user = userMapper.toEntity(userDto);
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         user.setPasswordHash(encodedPassword);
         User savedUser = userRepository.save(user);
-        log.info("Zapisano użytkownika o id: {}", savedUser.getId());
+        log.info("Saved user with id: {}", savedUser.getId());
+
         return userMapper.toDto(savedUser);
     }
 
     @Transactional
     public Optional<UserDto> getUserById(Long id) {
-        log.info("Pobieranie użytkownika o id: {}", id);
+        log.info("Retrieving user with id: {}", id);
         Optional<UserDto> result = userRepository.findById(id)
                 .map(userMapper::toDto);
-        log.info("Pobrano użytkownika o id: {}", id);
+        log.info("Retrieved user with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public Optional<UserDto> getUserByUsername(String username) {
-        log.info("Pobieranie użytkownika o nazwie: {}", username);
+        log.info("Retrieving user with username: {}", username);
         Optional<UserDto> result = userRepository.findByUsername(username)
                 .map(userMapper::toDto);
-        log.info("Pobrano użytkownika o nazwie: {}", username);
+        log.info("Retrieved user with username: {}", username);
+
         return result;
     }
 
     @Transactional
     public Optional<User> getUserEntityByUsername(String username) {
-        log.info("Pobieranie encji użytkownika o nazwie: {}", username);
+        log.info("Retrieving user entity with username: {}", username);
         Optional<User> result = userRepository.findByUsername(username);
-        log.info("Pobrano encję użytkownika o nazwie: {}", username);
+        log.info("Retrieved user entity with username: {}", username);
+
         return result;
     }
 
     @Transactional
     public Optional<User> getUserEntityById(Long id) {
-        log.info("Pobieranie encji użytkownika o id: {}", id);
+        log.info("Retrieving user entity with id: {}", id);
         Optional<User> result = userRepository.findById(id);
-        log.info("Pobrano encję użytkownika o id: {}", id);
+        log.info("Retrieved user entity with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public List<UserDto> getAllUsers() {
-        log.info("Pobieranie wszystkich użytkowników");
+        log.info("Retrieving all users");
         List<User> users = userRepository.findAll();
         List<UserDto> result = users.stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
-        log.info("Pobrano wszystkich użytkowników");
+        log.info("Retrieved all users");
+
         return result;
     }
 
     @Transactional
     public UserDto updateUser(UserDto userDto) {
-        log.info("Aktualizacja użytkownika o id: {}", userDto.getId());
+        log.info("Updating user with id: {}", userDto.getId());
         User existingUser = userRepository.findById(userDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym ID"));
+                .orElseThrow(() -> new IllegalArgumentException("User with such ID not found"));
 
         if (userDto.getUsername() != null && !userDto.getUsername().isEmpty()) {
             existingUser.setUsername(userDto.getUsername());
@@ -112,26 +118,28 @@ public class UserService {
         }
 
         User updatedUser = userRepository.save(existingUser);
-        log.info("Użytkownik zaktualizowany pomyślnie o id: {}", userDto.getId());
+        log.info("User updated successfully with id: {}", userDto.getId());
+
         return userMapper.toDto(updatedUser);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        log.info("Usuwanie użytkownika o id: {}", id);
+        log.info("Deleting user with id: {}", id);
         userRepository.deleteById(id);
-        log.info("Użytkownik o id {} został pomyślnie usunięty", id);
+        log.info("User with id {} has been successfully deleted", id);
     }
 
     public boolean isUserAuthorizedToUpdate(Long id) {
-        log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji użytkownika o id: {}", id);
+        log.info("Checking if user is authorized to update user with id: {}", id);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
-        log.info("Nazwa aktualnego użytkownika: {}", currentPrincipalName);
+        log.info("Current user name: {}", currentPrincipalName);
 
         Optional<UserDto> existingUserDto = getUserById(id);
         boolean isAuthorized = existingUserDto.isPresent() && existingUserDto.get().getUsername().equals(currentPrincipalName);
-        log.info("Użytkownik jest {} do aktualizacji użytkownika o id: {}", isAuthorized ? "upoważniony" : "nieupoważniony", id);
+        log.info("User is {} to update user with id: {}", isAuthorized ? "authorized" : "not authorized", id);
+
         return isAuthorized;
     }
 }

@@ -37,104 +37,108 @@ public class BidService {
 
     @Transactional
     public BidDto saveBid(BidDto bidDto) {
-        log.info("Zapisywanie oferty o id {}", bidDto.getId());
+        log.info("Saving bid with id {}", bidDto.getId());
         Optional<ItemDto> existingItem = itemService.getItemById(bidDto.getItemId());
         if (existingItem.isEmpty()) {
-            throw new IllegalArgumentException("Przedmiot o id " + bidDto.getItemId() + " nie istnieje");
+            throw new IllegalArgumentException("Item with id " + bidDto.getItemId() + " does not exist");
         }
-        if (!existingItem.get().getStatus().equals("aktywna")) {
-            throw new IllegalArgumentException("Licytacja musi być aktywna");
+        if (!existingItem.get().getStatus().equals("active")) {
+            throw new IllegalArgumentException("Auction must be active");
         }
         if (bidDto.getBidAmount() == null) {
-            throw new IllegalArgumentException("Kwota nie może być pusta");
+            throw new IllegalArgumentException("Amount cannot be empty");
         }
         if (bidDto.getBidAmount() <= 0 || bidDto.getBidAmount() <= existingItem.get().getCurrentPrice()) {
-            throw new IllegalArgumentException("Kwota musi być wyższa niż aktualna cena przedmiotu");
+            throw new IllegalArgumentException("Amount must be higher than the current item price");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User bidder = userService.getUserEntityByUsername(username).orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje"));
+        User bidder = userService.getUserEntityByUsername(username).orElseThrow(() -> new IllegalArgumentException("User does not exist"));
         Bid bid = bidMapper.toEntity(bidDto);
         bid.setBidder(bidder);
         Bid savedBid = bidRepository.save(bid);
 
         existingItem.get().setCurrentPrice(bidDto.getBidAmount());
         itemService.updateCurrentPrice(existingItem.get());
-        log.info("Zapisano ofertę o id {}", bidDto.getId());
+        log.info("Saved bid with id {}", bidDto.getId());
 
         return bidMapper.toDto(savedBid);
-
     }
 
     @Transactional
     public Optional<BidDto> getBidById(Long id) {
-        log.info("Pobieranie oferty o id: {}", id);
+        log.info("Retrieving bid with id: {}", id);
         Optional<BidDto> result = bidRepository.findById(id)
                 .map(bidMapper::toDto);
-        log.info("Pobrano ofertę o id: {}", id);
+        log.info("Retrieved bid with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public Optional<Bid> getBidEntityById(Long id) {
-        log.info("Pobieranie encji oferty o id: {}", id);
+        log.info("Retrieving bid entity with id: {}", id);
         Optional<Bid> result = bidRepository.findById(id);
-        log.info("Pobrano encję oferty o id: {}", id);
+        log.info("Retrieved bid entity with id: {}", id);
+
         return result;
     }
 
     @Transactional
     public List<BidDto> getAllBids() {
-        log.info("Pobieranie wszystkich ofert");
+        log.info("Retrieving all bids");
         List<Bid> bids = bidRepository.findAll();
         List<BidDto> result = bids.stream()
                 .map(bidMapper::toDto)
                 .collect(Collectors.toList());
-        log.info("Pobrano wszystkie oferty");
+        log.info("Retrieved all bids");
+
         return result;
     }
 
     @Transactional
     public List<BidDto> getBidsByItemId(Long itemId) {
-        log.info("Pobieranie ofert dla przedmiotu o id: {}", itemId);
+        log.info("Retrieving bids for item with id: {}", itemId);
         List<Bid> bids = bidRepository.getBidsByItemId(itemId);
         List<BidDto> result = bids.stream()
                 .map(bidMapper::toDto)
                 .collect(Collectors.toList());
-        log.info("Pobrano oferty dla przedmiotu o id: {}", itemId);
+        log.info("Retrieved bids for item with id: {}", itemId);
+
         return result;
     }
 
     @Transactional
     public Optional<BidDto> getWinnerBidByItemId(Long itemId) {
-        log.info("Pobieranie zwycięskiej oferty dla przedmiotu o id: {}", itemId);
+        log.info("Retrieving winning bid for item with id: {}", itemId);
         List<BidDto> bids = getBidsByItemId(itemId);
         if (bids.isEmpty()) {
             return Optional.empty();
         } else {
             Optional<BidDto> result = Optional.ofNullable(bids.getLast());
-            log.info("Pobrano zwycięską ofertę dla przedmiotu o id: {}", itemId);
+            log.info("Retrieved winning bid for item with id: {}", itemId);
             return result;
         }
     }
 
     @Transactional
     public void deleteBid(Long id) {
-        log.info("Usuwanie oferty o id: {}", id);
+        log.info("Deleting bid with id: {}", id);
         bidRepository.deleteById(id);
-        log.info("Oferta o id {} została pomyślnie usunięta", id);
+        log.info("Bid with id {} has been successfully deleted", id);
     }
 
     public boolean isUserAuthorizedToUpdateBid(Long id) {
-        log.info("Sprawdzanie, czy użytkownik jest upoważniony do aktualizacji oferty o id: {}", id);
+        log.info("Checking if user is authorized to update bid with id: {}", id);
         Optional<BidDto> bidDto = getBidById(id);
         if (bidDto.isEmpty()) {
-            throw new IllegalArgumentException("Oferta o id " + id + " nie istnieje");
+            throw new IllegalArgumentException("Bid with id " + id + " does not exist");
         }
 
         Long bidderId = bidDto.get().getBidderId();
         boolean isAuthorized = userService.isUserAuthorizedToUpdate(bidderId);
-        log.info("Użytkownik {} jest {} do aktualizacji oferty o id: {}", bidderId, isAuthorized ? "upoważniony" : "nieupoważniony", id);
+        log.info("User {} is {} to update bid with id: {}", bidderId, isAuthorized ? "authorized" : "not authorized", id);
+
         return isAuthorized;
     }
 }

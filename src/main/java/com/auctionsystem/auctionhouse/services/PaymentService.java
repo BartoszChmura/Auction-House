@@ -50,7 +50,7 @@ public class PaymentService {
 
 
     public OAuthTokenResponse createOAuthToken() {
-        log.info("Tworzenie tokenu OAuth");
+        log.info("Creating OAuth token");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -65,24 +65,24 @@ public class PaymentService {
 
         try {
             OAuthTokenResponse tokenResponse = objectMapper.readValue(response.getBody(), OAuthTokenResponse.class);
-            log.info("Token OAuth utworzony pomyślnie");
+            log.info("OAuth token created successfully");
             return tokenResponse;
         } catch (Exception e) {
-            throw new RuntimeException("Nie udało się uzyskać tokenu", e);
+            throw new RuntimeException("Failed to get token", e);
         }
     }
 
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest, Long winningBidId) {
-        log.info("Inicjowanie płatności dla wygranej licytacji o id: {}", winningBidId);
+        log.info("Initiating payment for winning bid with id: {}", winningBidId);
         try {
             Optional<Bid> winningBid = bidService.getBidEntityById(winningBidId);
             if (winningBid.isEmpty()) {
-                throw new EntityNotFoundException("Nie znaleziono wygranej licytacji");
+                throw new EntityNotFoundException("Winning bid not found");
             }
 
             Item item = winningBid.get().getItem();
-            if (!item.getStatus().equals("oczekuje na płatność")) {
-                throw new IllegalArgumentException("Aukcja jeszcze się nie zakończyła");
+            if (!item.getStatus().equals("awaiting payment")) {
+                throw new IllegalArgumentException("Auction has not yet ended");
             }
 
             PaymentRequest.Product product = new PaymentRequest.Product();
@@ -120,37 +120,35 @@ public class PaymentService {
 
             paymentRepository.save(payment);
 
-            log.info("Płatność zainicjowana pomyślnie dla wygranej licytacji o id: {}", winningBidId);
+            log.info("Payment initiated successfully for winning bid with id: {}", winningBidId);
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Nie udało się zainicjować płatności", e);
+            throw new RuntimeException("Failed to initiate payment", e);
         }
     }
 
     public void updatePaymentStatus(PaymentNotification notification) {
-        log.info("Aktualizacja statusu płatności dla transakcji o id: {}", notification.getOrder().getOrderId());
+        log.info("Updating payment status for transaction with id: {}", notification.getOrder().getOrderId());
         Payment existingPayment = paymentRepository.findByTransactionId(notification.getOrder().getOrderId());
         if (existingPayment == null) {
-            throw new EntityNotFoundException("Nie znaleziono płatności o id transakcji " + notification.getOrder().getOrderId());
+            throw new EntityNotFoundException("Payment not found with transaction id " + notification.getOrder().getOrderId());
         }
         existingPayment.setPaymentStatus(notification.getOrder().getStatus());
         if (existingPayment.getPaymentStatus().equals("COMPLETED")) {
             finishPayment(existingPayment);
         }
         paymentRepository.save(existingPayment);
-        log.info("Status płatności zaktualizowany pomyślnie dla transakcji o id: {}", notification.getOrder().getOrderId());
+        log.info("Payment status updated successfully for transaction with id: {}", notification.getOrder().getOrderId());
     }
 
     public void finishPayment(Payment payment) {
-        log.info("Finalizacja płatności dla przedmiotu o id: {}", payment.getBid().getItem().getId());
+        log.info("Finalizing payment for item with id: {}", payment.getBid().getItem().getId());
         Optional<Item> existingItem = itemService.getItemEntityById(payment.getBid().getItem().getId());
         if (existingItem.isEmpty()) {
-            throw new EntityNotFoundException("Nie znaleziono przedmiotu");
+            throw new EntityNotFoundException("Item not found");
         }
-        existingItem.get().setStatus("sprzedano");
+        existingItem.get().setStatus("sold");
         itemService.updateItem(itemMapper.toDto(existingItem.get()));
-        log.info("Płatność sfinalizowana pomyślnie dla przedmiotu o id: {}", payment.getBid().getItem().getId());
+        log.info("Payment finalized successfully for item with id: {}", payment.getBid().getItem().getId());
     }
 }
-
-

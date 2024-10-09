@@ -56,7 +56,7 @@ public class CategoryControllerIntegrationTests {
     public void setup() {
         userRepository.save(createUser(1L, "testuser1"));
 
-        categoryRepository.save(createCategory(1L, "Elektronika"));
+        categoryRepository.save(createCategory(1L, "Electronics"));
 
         // Granting authentication to testuser1
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername("testuser1");
@@ -65,7 +65,7 @@ public class CategoryControllerIntegrationTests {
 
     @Test
     public void testAddCategory_OK() throws Exception {
-        CategoryDto categoryDto = createCategoryDto(2L, "Książki");
+        CategoryDto categoryDto = createCategoryDto(2L, "Books");
 
         mockMvc.perform(post("/category/add")
                         .header("Authorization", "Bearer " + jwtToken)
@@ -73,12 +73,12 @@ public class CategoryControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(categoryDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2L))
-                .andExpect(jsonPath("$.categoryName").value("Książki"));
+                .andExpect(jsonPath("$.categoryName").value("Books"));
     }
 
     @Test
     public void testAddCategory_Conflict() throws Exception {
-        CategoryDto categoryDto = createCategoryDto(1L, "Elektronika");
+        CategoryDto categoryDto = createCategoryDto(1L, "Electronics");
 
         mockMvc.perform(post("/category/add")
                         .header("Authorization", "Bearer " + jwtToken)
@@ -93,7 +93,7 @@ public class CategoryControllerIntegrationTests {
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.categoryName").value("Elektronika"));
+                .andExpect(jsonPath("$.categoryName").value("Electronics"));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class CategoryControllerIntegrationTests {
         mockMvc.perform(get("/category/10")
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").value("Przedmiot o id 10 nie istnieje"));
+                .andExpect(jsonPath("$").value("Item with id 10 does not exist"));
     }
 
     @Test
@@ -110,14 +110,14 @@ public class CategoryControllerIntegrationTests {
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].categoryName").value("Elektronika"));
+                .andExpect(jsonPath("$[0].categoryName").value("Electronics"));
     }
 
     @Test
     public void testUpdateCategory_OK() throws Exception {
         CategoryDto categoryDto = createCategoryDto(1L, "Elektronika");
 
-        categoryDto.setCategoryName("Książki");
+        categoryDto.setCategoryName("Books");
 
         mockMvc.perform(put("/category/1")
                         .header("Authorization", "Bearer " + jwtToken)
@@ -125,12 +125,12 @@ public class CategoryControllerIntegrationTests {
                         .content(objectMapper.writeValueAsString(categoryDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.categoryName").value("Książki"));
+                .andExpect(jsonPath("$.categoryName").value("Books"));
     }
 
     @Test
     public void testUpdateCategory_NotFound() throws Exception {
-        CategoryDto categoryDto = createCategoryDto(10L, "Elektronika");
+        CategoryDto categoryDto = createCategoryDto(10L, "Electronics");
 
         mockMvc.perform(put("/category/10")
                         .header("Authorization", "Bearer " + jwtToken)

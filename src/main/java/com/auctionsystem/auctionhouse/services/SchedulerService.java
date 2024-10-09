@@ -17,10 +17,10 @@ public class SchedulerService {
 
     @Scheduled(fixedRate = 60000)
     public void checkItemStatuses() {
-        System.out.println("Sprawdzanie statusów przedmiotów...");
+        System.out.println("Checking items statuses...");
         List<Item> items = itemService.getAllItemsEntity();
         for (Item item : items) {
-            if (item.getEndTime().isBefore(java.time.LocalDateTime.now()) && item.getStatus().equals("aktywna")) {
+            if (item.getEndTime().isBefore(java.time.LocalDateTime.now()) && item.getStatus().equals("active")) {
                 itemService.endAuction(item.getId());
             }
         }

@@ -145,7 +145,7 @@ public class BidControllerIntegrationTests {
     @Test
     public void testGetWinnerBidByItemId_OK() throws Exception {
         Item item = itemRepository.save(createItem(3L, "testItem3", "testDescription3", 1L));
-        item.setWinner(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono oferty o id 1")));
+        item.setWinner(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Bid with id 1 does not exist")));
         mockMvc.perform(get("/bid/winner/1")
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
@@ -199,8 +199,8 @@ public class BidControllerIntegrationTests {
         Bid bid = new Bid();
         bid.setId(id);
         bid.setBidAmount(bidAmount);
-        bid.setItem(itemRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono przedmiotu o id 1")));
-        bid.setBidder(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id 1")));
+        bid.setItem(itemRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Item with id 1 does not exist")));
+        bid.setBidder(userRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("User with id 1 does not exist")));
         return bid;
     }
 
@@ -212,9 +212,9 @@ public class BidControllerIntegrationTests {
         item.setStartPrice(100.0);
         item.setCurrentPrice(100.0);
         item.setEndTime(LocalDateTime.now().plusDays(1));
-        item.setStatus("aktywna");
-        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Nie znaleziono kategori o id 1")));
-        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("Nie znaleziono użytkownika o id " + sellerId)));
+        item.setStatus("active");
+        item.setCategory(categoryRepository.findById(1L).orElseThrow(() -> new NoSuchElementException("Category with id 1 does not exist")));
+        item.setSeller(userRepository.findById(sellerId).orElseThrow(() -> new NoSuchElementException("User with id " + sellerId + " does not exist")));
         return item;
     }
 
@@ -226,6 +226,4 @@ public class BidControllerIntegrationTests {
         user.setEmail("testuser@mail.com");
         return user;
     }
-
-
 }

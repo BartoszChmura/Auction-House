@@ -47,13 +47,13 @@ public class BidServiceUnitTests {
     @Test
     public void testSaveBid() {
         // Given
-        BidDto bidDto = createBidDto(1L,1L,1L);
-        Bid bid = createBid(1L,1L,1L);
+        BidDto bidDto = createBidDto(1L, 1L, 1L);
+        Bid bid = createBid(1L, 1L, 1L);
 
         ItemDto itemDto = new ItemDto();
         itemDto.setId(1L);
         itemDto.setCurrentPrice(50.0);
-        itemDto.setStatus("aktywna");
+        itemDto.setStatus("active");
 
         User user = new User();
         user.setId(1L);

@@ -29,12 +29,12 @@ public class SchedulerServiceUnitTests {
     public void testCheckItemStatuses() {
         Item activeItem = new Item();
         activeItem.setId(1L);
-        activeItem.setStatus("aktywna");
+        activeItem.setStatus("active");
         activeItem.setEndTime(LocalDateTime.now().minusMinutes(1));
 
         Item inactiveItem = new Item();
         inactiveItem.setId(2L);
-        inactiveItem.setStatus("nie sprzedano");
+        inactiveItem.setStatus("not sold");
         inactiveItem.setEndTime(LocalDateTime.now().minusMinutes(1));
 
         List<Item> items = Arrays.asList(activeItem, inactiveItem);

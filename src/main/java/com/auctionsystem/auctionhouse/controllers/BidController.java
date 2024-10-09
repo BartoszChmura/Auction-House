@@ -36,7 +36,7 @@ public class BidController {
         if (bidDto.isPresent()) {
             return ResponseEntity.ok(bidDto.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Licytacja o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bid with id " + id + " does not exist");
         }
     }
 
@@ -44,7 +44,7 @@ public class BidController {
     public ResponseEntity<?> getWinnerBidByItemId(@PathVariable Long itemId) {
         Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(itemId);
         if (winnerBid.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nie ma zwycięzcy na przedmiot o id " + itemId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is no winner for the item with id " + itemId);
         }
         return ResponseEntity.ok(winnerBid.get());
     }
@@ -65,12 +65,12 @@ public class BidController {
     public ResponseEntity<?> deleteBid(@PathVariable Long id) {
         Optional<BidDto> bidDto = bidService.getBidById(id);
         if (bidDto.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Licytacja o id " + id + " nie istnieje");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bid with id " + id + " does not exist");
         }
         if (!bidService.isUserAuthorizedToUpdateBid(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do usunięcia czyjejś oferty");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete someone else's bid");
         }
         bidService.deleteBid(id);
-        return ResponseEntity.ok("Licytacja o id " + id + " została usunięta");
+        return ResponseEntity.ok("Bid with id " + id + " has been deleted");
     }
 }

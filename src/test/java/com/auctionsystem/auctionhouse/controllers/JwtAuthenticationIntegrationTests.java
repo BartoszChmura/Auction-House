@@ -80,6 +80,4 @@ public class JwtAuthenticationIntegrationTests {
         user.setEmail("testuser@mail.com");
         return user;
     }
-
-
 }

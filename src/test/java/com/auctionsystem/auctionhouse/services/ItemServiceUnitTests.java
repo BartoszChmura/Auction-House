@@ -197,5 +197,4 @@ public class ItemServiceUnitTests {
         item.setEndTime(LocalDateTime.now().plusDays(1));
         return item;
     }
-
 }

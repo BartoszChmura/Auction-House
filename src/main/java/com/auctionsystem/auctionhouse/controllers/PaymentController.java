@@ -29,12 +29,12 @@ public class PaymentController {
             paymentService.updatePaymentStatus(paymentNotification);
             return ResponseEntity.ok(paymentNotification);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Nie udało się zaktualizować statusu płatności");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update payment status");
         }
     }
 
     @PostMapping("/pay/{winningBidId}")
-    public ResponseEntity<?> payForItem (@RequestBody PaymentRequest paymentRequest, @PathVariable Long winningBidId) {
+    public ResponseEntity<?> payForItem(@RequestBody PaymentRequest paymentRequest, @PathVariable Long winningBidId) {
         try {
             PaymentResponse paymentResponse = paymentService.initiatePayment(paymentRequest, winningBidId);
             return ResponseEntity.ok(paymentResponse);

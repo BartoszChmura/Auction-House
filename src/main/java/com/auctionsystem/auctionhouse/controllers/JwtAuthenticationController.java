@@ -35,9 +35,9 @@ public class JwtAuthenticationController {
             final String token = jwtService.generateToken(userDetails);
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: Incorrect username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Authentication process failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication process failed");
         }
     }
 

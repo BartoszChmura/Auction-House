@@ -18,6 +18,7 @@ public class CorsConfig {
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
+
         return new CorsFilter((org.springframework.web.cors.CorsConfigurationSource) source);
     }
 }
