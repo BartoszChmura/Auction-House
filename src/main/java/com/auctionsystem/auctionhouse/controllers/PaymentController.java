@@ -4,6 +4,10 @@ import com.auctionsystem.auctionhouse.dtos.PaymentNotification;
 import com.auctionsystem.auctionhouse.dtos.PaymentRequest;
 import com.auctionsystem.auctionhouse.dtos.PaymentResponse;
 import com.auctionsystem.auctionhouse.services.PaymentService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/payment")
+@Tag(name = "Payment", description = "Endpoints for payment processing")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -24,6 +29,7 @@ public class PaymentController {
     }
 
     @PostMapping("/notify")
+    @Hidden
     public ResponseEntity<?> receivePaymentNotification(@RequestBody PaymentNotification paymentNotification) {
         try {
             paymentService.updatePaymentStatus(paymentNotification);
@@ -34,6 +40,7 @@ public class PaymentController {
     }
 
     @PostMapping("/pay/{winningBidId}")
+    @Operation(summary = "Pay for an item", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> payForItem(@RequestBody PaymentRequest paymentRequest, @PathVariable Long winningBidId) {
         try {
             PaymentResponse paymentResponse = paymentService.initiatePayment(paymentRequest, winningBidId);

@@ -3,6 +3,9 @@ package com.auctionsystem.auctionhouse.controllers;
 import com.auctionsystem.auctionhouse.dtos.CategoryDto;
 
 import com.auctionsystem.auctionhouse.services.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/category")
+@Tag(name = "Category", description = "Endpoints for managing categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -23,6 +27,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
+    @Operation(summary = "Add a new category", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> addCategory(@RequestBody CategoryDto categoryDto) {
         try {
             CategoryDto savedCategory = categoryService.saveCategory(categoryDto);
@@ -33,12 +38,14 @@ public class CategoryController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all categories", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
         List<CategoryDto> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a category by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         Optional<CategoryDto> categoryDto = categoryService.getCategoryById(id);
         if (categoryDto.isPresent()) {
@@ -49,6 +56,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a category", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
         Optional<CategoryDto> existingCategory = categoryService.getCategoryById(id);
         if (existingCategory.isEmpty()) {
@@ -60,6 +68,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a category", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         Optional<CategoryDto> existingCategory = categoryService.getCategoryById(id);
         if (existingCategory.isEmpty()) {

@@ -1,5 +1,6 @@
 package com.auctionsystem.auctionhouse.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,12 +14,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PaymentDto {
 
+    @Schema(description = "Unique identifier of the payment, generated automatically", readOnly = true)
     private Long id;
 
     private Long bidId;
 
     private Double amount;
 
+    @Schema(description = "Payment date of the payment, generated automatically", readOnly = true)
     private LocalDateTime paymentDate;
 
     private String paymentStatus;

@@ -4,6 +4,8 @@ import com.auctionsystem.auctionhouse.dtos.JwtRequest;
 import com.auctionsystem.auctionhouse.dtos.JwtResponse;
 import com.auctionsystem.auctionhouse.services.JwtUserDetailsService;
 import com.auctionsystem.auctionhouse.services.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "Authentication", description = "Endpoints for user authentication")
 public class JwtAuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -28,6 +31,7 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping("/authenticate")
+    @Operation(summary = "Get a JWT token for authentication", security = {})
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
         try {
             authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());

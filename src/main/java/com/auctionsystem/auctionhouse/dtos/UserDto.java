@@ -1,5 +1,6 @@
 package com.auctionsystem.auctionhouse.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserDto {
 
+    @Schema(description = "Unique identifier of the user, generated automatically", readOnly = true)
     private Long id;
 
     private String username;
@@ -21,7 +23,9 @@ public class UserDto {
 
     private String password;
 
+    @Schema(description = "Creation time of the user, generated automatically", readOnly = true)
     private LocalDateTime createdAt;
 
+    @Schema(description = "Update time of the user, generated automatically", readOnly = true)
     private LocalDateTime updatedAt;
 }

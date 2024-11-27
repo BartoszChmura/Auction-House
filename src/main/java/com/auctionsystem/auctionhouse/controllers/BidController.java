@@ -2,7 +2,11 @@ package com.auctionsystem.auctionhouse.controllers;
 
 import com.auctionsystem.auctionhouse.dtos.BidDto;
 import com.auctionsystem.auctionhouse.services.BidService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/bid")
 @Slf4j
+@Tag(name = "Bid", description = "Endpoints for bidding on items")
 public class BidController {
 
     private final BidService bidService;
@@ -24,6 +29,7 @@ public class BidController {
     }
 
     @PostMapping
+    @Operation(summary = "Bid on an item", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> addBid(@RequestBody BidDto bidDto) {
         log.info("Received BidDto:" + bidDto.getBidAmount() + " " + bidDto.getItemId() + " " + bidDto.getBidderId() + " " + bidDto.getId());
         BidDto savedBid = bidService.saveBid(bidDto);
@@ -31,6 +37,7 @@ public class BidController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a bid by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getBidById(@PathVariable Long id) {
         Optional<?> bidDto = bidService.getBidById(id);
         if (bidDto.isPresent()) {
@@ -41,6 +48,7 @@ public class BidController {
     }
 
     @GetMapping("/winner/{itemId}")
+    @Hidden
     public ResponseEntity<?> getWinnerBidByItemId(@PathVariable Long itemId) {
         Optional<BidDto> winnerBid = bidService.getWinnerBidByItemId(itemId);
         if (winnerBid.isEmpty()) {
@@ -50,18 +58,21 @@ public class BidController {
     }
 
     @GetMapping("/item/{itemId}")
+    @Hidden
     public ResponseEntity<?> getBidsByItemId(@PathVariable Long itemId) {
         List<BidDto> bids = bidService.getBidsByItemId(itemId);
         return ResponseEntity.ok(bids);
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all bids", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<BidDto>> getAllBids() {
         List<BidDto> bids = bidService.getAllBids();
         return ResponseEntity.ok(bids);
     }
 
     @DeleteMapping("/{id}")
+    @Hidden
     public ResponseEntity<?> deleteBid(@PathVariable Long id) {
         Optional<BidDto> bidDto = bidService.getBidById(id);
         if (bidDto.isEmpty()) {

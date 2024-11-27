@@ -2,6 +2,9 @@ package com.auctionsystem.auctionhouse.controllers;
 
 import com.auctionsystem.auctionhouse.dtos.UserDto;
 import com.auctionsystem.auctionhouse.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,18 +15,19 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "User", description = "Endpoints for managing users")
 public class UserController {
 
     private final UserService userService;
 
 
     @Autowired
-
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new user")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
         try {
             UserDto savedUser = userService.saveUser(userDto);
@@ -34,6 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a user by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         Optional<UserDto> userDto = userService.getUserById(id);
         if (userDto.isPresent()) {
@@ -44,6 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
+    @Operation(summary = "Get a user by username", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Optional<UserDto> userDto = userService.getUserByUsername(username);
         if (userDto.isPresent()) {
@@ -54,12 +60,14 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all users", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a user", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         Optional<UserDto> existingUser = userService.getUserById(id);
         if (existingUser.isEmpty()) {
@@ -75,6 +83,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a user", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         Optional<UserDto> existingUser = userService.getUserById(id);
         if (existingUser.isEmpty()) {

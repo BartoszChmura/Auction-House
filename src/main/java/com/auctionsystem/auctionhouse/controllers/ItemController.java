@@ -2,6 +2,9 @@ package com.auctionsystem.auctionhouse.controllers;
 
 import com.auctionsystem.auctionhouse.dtos.ItemDto;
 import com.auctionsystem.auctionhouse.services.ItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/item")
+@Tag(name = "Item", description = "Endpoints for managing items")
 public class ItemController {
 
     private final ItemService itemService;
@@ -22,18 +26,21 @@ public class ItemController {
     }
 
     @PostMapping("/save")
+    @Operation(summary = "Add a new item", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> saveItem(@RequestBody ItemDto itemDto) {
         ItemDto savedItem = itemService.saveItem(itemDto);
         return ResponseEntity.ok(savedItem);
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all items", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<ItemDto>> getAllItems() {
         List<ItemDto> items = itemService.getAllItems();
         return ResponseEntity.ok(items);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get an item by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> getItemById(@PathVariable Long id) {
         Optional<ItemDto> itemDto = itemService.getItemById(id);
         if (itemDto.isPresent()) {
@@ -44,6 +51,7 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update an item", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) {
         Optional<ItemDto> existingItem = itemService.getItemById(id);
         if (existingItem.isEmpty()) {
@@ -58,6 +66,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an item", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> deleteItem(@PathVariable Long id) {
         Optional<ItemDto> existingItem = itemService.getItemById(id);
         if (existingItem.isEmpty()) {
