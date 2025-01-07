@@ -11,7 +11,7 @@ Auction House is a web application based on an auction platform concept, develop
 
 ## Technologies Used
 
-### Core Technology Stack
+### Technology Stack
 - **Java**
 - **Spring/Spring Boot**
 - **Hibernate**
