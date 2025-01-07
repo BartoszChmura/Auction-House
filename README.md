@@ -1,53 +1,53 @@
 # Auction House
 
-## Opis
-Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana głównie za pomocą frameworku Spring Boot, która umożliwia użytkownikom tworzenie, zarządzanie i licytowanie aukcji. Aplikacja oferuje pełne wsparcie dla zarządzania kontami użytkowników, mechanizmy licytacji, integrację z systemami płatności oraz zaawansowane funkcje zabezpieczeń. Repozytorium dotyczy części backendowej aplikacji.
+## Description
+Auction House is a web application based on an auction platform concept, developed primarily using the Spring Boot framework. It allows users to create, manage, and bid on auctions. The application provides full support for user account management, bidding mechanisms, integration with payment systems, and advanced security features. This repository pertains to the backend portion of the application.
 
-## Funkcje
-- Rejestracja i uwierzytelnianie użytkowników za pomocą tokena JWT
-- Tworzenie i zarządzanie aukcjami
-- System licytacji
-- Integracja z zewnętrznym systemem płatności
+## Features
+- User registration and authentication using JWT tokens
+- Auction creation and management
+- Bidding system
+- Integration with external payment systems
 
-## Wykorzystane Technologie
+## Technologies Used
 
-### Główny Stack Technologiczny
+### Core Technology Stack
 - **Java**
 - **Spring/Spring Boot**
 - **Hibernate**
 - **PostgreSQL**
 
-### Narzędzia do testowania
+### Testing Tools
 - **JUnit**
 - **Mockito**
 - **H2 Database**
-- **Spring Boot Test***
+- **Spring Boot Test**
 
-### Narzędzia pomocnicze
+### Auxiliary Tools
 - **Maven**
 - **Git**
 - **JWT**
 - **Ngrok**
 
-## Pierwsze Kroki
+## Getting Started
 
-### Wymagania
+### Requirements
 - **Java 17+**
 - **Maven**
 - **PostgreSQL**
 - **Git**
 
-### Instalacja
+### Installation
 
-1. **Sklonuj repozytorium:**
+1. **Clone the repository:**
     ```bash
     git clone https://github.com/BartoszChmura/auction-house.git
     cd auction-house
     ```
 
-2. **Skonfiguruj bazę danych PostgreSQL:**
-    - Utwórz bazę danych o nazwie `AuctionHouse`.
-    - Skonfiguruj plik `application.properties` z danymi dostępowymi do bazy danych.
+2. **Configure the PostgreSQL database:**
+    - Create a database named `AuctionHouse`.
+    - Configure the `application.properties` file with the database access credentials.
     ```properties
     spring.datasource.url=jdbc:postgresql://localhost:5432/AuctionHouse
     spring.datasource.username=postgres
@@ -56,19 +56,22 @@ Auction House to aplikacja webowa na zasadach portalu aukcyjnego, opracowana gł
     spring.jpa.hibernate.ddl-auto=update
     ```
 
-3. **Zbuduj i uruchom aplikację:**
+3. **Build and run the application:**
     ```bash
     mvn clean install
     mvn spring-boot:run
     ```
 
-4. **Dostęp do API:**
-    Serwis domyślnie będzie dostępny na porcie 8080.
+4. **Access the API:**
+    The service will be available on port 8080 by default.
+
+### API Endpoints Documentation:
+You can view and test the available endpoints through Swagger UI at: [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
 
 ### Auction House Interface
 
-Prosty interfejs w postaci strony internetowej, prezentujący działanie aplikacji, do uruchomienia lokalnie: https://github.com/BartoszChmura/Auction-House-Interface (link do repozytorium).
+A simple web interface demonstrating the application's functionality can be run locally: [Auction House Interface Repository](https://github.com/BartoszChmura/Auction-House-Interface).
 
-### System płatności
+### Payment System Integration
 
----Do poprawnego działania zewnętrznego systemu płatności wymagane będzie wykorzystanie narzędzia do przekierowania localhosta na domenę, np. ngrok.---
+---To properly utilize the external payment system, you will need a tool to expose your localhost to the web, such as Ngrok.---
