@@ -1,7 +1,7 @@
 # Auction House
 
 ## Description
-Auction House is a web application based on an auction platform concept, developed primarily using the Spring Boot framework. It allows users to create, manage, and bid on auctions. The application provides full support for user account management, bidding mechanisms, integration with payment systems, and advanced security features. This repository pertains to the backend portion of the application.
+**Auction House** is a web application based on an auction platform concept, developed primarily using the Spring Boot framework. It allows users to create, manage, and bid on auctions. The application provides full support for user account management, bidding mechanisms, integration with payment systems, and advanced security features. This repository pertains to the backend portion of the application.
 
 ## Features
 - User registration and authentication using JWT tokens
