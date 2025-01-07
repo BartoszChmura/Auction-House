@@ -1,6 +1,7 @@
 package com.auctionsystem.auctionhouse.configs;
 
 import com.auctionsystem.auctionhouse.services.JwtUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ public class WebSecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
     private final JwtUserDetailsService jwtUserDetailsService;
 
+    @Autowired
     public WebSecurityConfig(JwtRequestFilter jwtRequestFilter, JwtUserDetailsService jwtUserDetailsService) {
         this.jwtRequestFilter = jwtRequestFilter;
         this.jwtUserDetailsService = jwtUserDetailsService;
