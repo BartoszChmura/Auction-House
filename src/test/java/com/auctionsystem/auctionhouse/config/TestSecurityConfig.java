@@ -33,7 +33,6 @@ public class TestSecurityConfig {
 
 
     public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-        log.info("Profil test aktywny");
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable)
